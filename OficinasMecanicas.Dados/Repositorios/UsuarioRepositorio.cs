@@ -49,42 +49,30 @@ namespace OficinasMecanicas.Dados.Repositorios
             return usuario;
         }
 
-
-
         public async Task<bool> NomePrincipalJaCadastrado(string nome, Guid? id)
         {
             return await _contexto.Usuarios.Where(c => c.Username == nome.ToUpper() && (id.HasValue ? c.Id != id : true)).AnyAsync();
         }
-
-        
+                
         public async Task<bool> EmailPrincipalJaCadastrado(string email, Guid? id)
         {
             return await _contexto.Usuarios.Where(c =>  c.Email == email.ToUpper() && (id.HasValue ? c.Id != id : true)).AnyAsync();
         }
-
-       
+               
         public async Task<bool> IdUsuarioValido(Guid id)
         => await _contexto.Usuarios.Where(c => c.Id == id).AnyAsync();
-
 
         public async Task<IList<Usuarios>> BuscarTodos() 
         => await _contexto.Usuarios.AsNoTracking().ToListAsync();
 
         public async Task<Usuarios?> BuscarUsuarioPorId(Guid id)
         => await _contexto.Usuarios.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync();
-
-        public async Task<Usuarios?> BuscarUsuarioPorIdParaEdicaoSemRastreio(Guid id)
-        {
-            var usuario = await _contexto.Usuarios.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync();
-
-            if (usuario == null)
-                return null;
-          
-            return usuario;
-        }
-
+        
         public async Task<Usuarios?> BuscarPorEmail(string email)
-        => await _contexto.Usuarios.Where(c => c.Email == email.ToUpper()).AsNoTracking().FirstOrDefaultAsync();
+        => await _contexto.Usuarios.Where(c => c.Email.ToUpper() == email.ToUpper()).AsNoTracking().FirstOrDefaultAsync();
+
+        public async Task<Usuarios?> BuscarPorUsername(string username)
+        => await _contexto.Usuarios.Where(c => c.Username.ToUpper() == username.ToUpper()).AsNoTracking().FirstOrDefaultAsync();
 
         public async Task<bool> EmailValidoLogin(string email)
         => await _contexto.Usuarios.Where(c =>  c.Email == email.ToUpper().Trim()).AnyAsync();

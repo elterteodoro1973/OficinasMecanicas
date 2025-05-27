@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using OficinasMecanicas.Aplicacao.DTO;
+using Microsoft.IdentityModel.Tokens;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Dominio.Entidades;
@@ -7,16 +7,9 @@ using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace OficinasMecanicas.Aplicacao.Servicos
 {
@@ -38,9 +31,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
         public async Task Cadastrar(string caminho, CadastrarEditarUsuarioDTO dto)
         {
-            if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrWhiteSpace(dto.CPF))
-                dto.CPF = dto.CPF.Replace(".", "").Replace("-", "").Replace("/", "");
-
             var usuario = _mapper.Map<Usuarios>(dto);           
 
             await _usuarioServico.Adicionar(caminho, usuario);
@@ -52,7 +42,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
             if (!string.IsNullOrEmpty(filtro) && !string.IsNullOrWhiteSpace(filtro))
             {
-                dtos = dtos.Where(c => c.Nome.ToUpper().Contains(filtro.ToUpper()) || c.Email.ToUpper().Contains(filtro.ToUpper()) || c.CPF.Contains(filtro)).ToList();
+                dtos = dtos.Where(c => c.Nome.ToUpper().Contains(filtro.ToUpper()) || c.Email.ToUpper().Contains(filtro.ToUpper()) ).ToList();
             }
 
             return dtos;
@@ -64,6 +54,24 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         public async Task Logout()
         {
             _usuarioServico.Logout();
+        }
+
+
+        public async Task<LoginUsuarioDTO?> BuscarPorId(Guid usuarioId)
+        {
+            var dtos = _mapper.Map<LoginUsuarioDTO>(await _usuarioRepositorio.BuscarUsuarioPorId(usuarioId)); 
+            return dtos;
+
+        }
+        public async Task<LoginUsuarioDTO?> BuscarPorEmail(string email)
+        {
+            var dtos = _mapper.Map<LoginUsuarioDTO>(await _usuarioRepositorio.BuscarPorEmail(email));
+            return dtos;
+        }
+        public async Task<LoginUsuarioDTO?> BuscarPorUsername(string username)
+        {
+            var dtos = _mapper.Map<LoginUsuarioDTO>(await _usuarioRepositorio.BuscarPorUsername(username));
+            return dtos;
         }
 
         public async Task<UsuariosTelaInicialDTO?> BuscarUsuarioTelaCadastrarNovaSenha(Guid idUsuario)
@@ -94,13 +102,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             {
                 _notificador.Adicionar(new Notificacao("Usuario inválido !"));
                 return;
-            }
-
-            if (!string.IsNullOrEmpty(dto.CPF) && !string.IsNullOrWhiteSpace(dto.CPF))
-                dto.CPF = dto.CPF.Replace(".", "").Replace("-", "");
-
-           
-            
+            }            
 
             var usuario = _mapper.Map<Usuarios>(dto);
             
@@ -117,9 +119,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
         public async Task<UsuariosTelaInicialDTO?> BuscarUsuarioPorId(Guid idUsuario)
         => _mapper.Map<UsuariosTelaInicialDTO?>(await _usuarioRepositorio.BuscarUsuarioPorId(idUsuario));
-
-       
-
+         
         private string BuscarNomeCampoLog(string nomeCampo)
         {
             string nomeNormalizado = "";
@@ -139,7 +139,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return nomeNormalizado;
         }
 
-
         public async Task ResetarSenha(string caminho, string email)
         {
             await _usuarioServico.ResetarSenha(caminho, email);
@@ -147,5 +146,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
         public async Task ValidarTokenCadastrarNovaSenha(string token)
         => await _usuarioServico.ValidarTokenResetarSenha(token);
+
+        
     }
 }

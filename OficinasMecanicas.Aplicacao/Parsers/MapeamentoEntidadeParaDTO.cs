@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using OficinasMecanicas.Aplicacao.DTO;
-using OficinasMecanicas.Aplicacao.DTO.Perfis;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Dominio.Entidades;
 
@@ -17,7 +15,8 @@ namespace OficinasMecanicas.Aplicacao.Parsers
 
             CreateMap<Usuarios, LoginUsuarioDTO>()
                 .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
-                .ForMember(c => c.Username, m => m.MapFrom(c => c.Username));
+                .ForMember(c => c.Username, m => m.MapFrom(c => c.Username))
+                .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
 
             CreateMap<Usuarios, CadastrarEditarUsuarioDTO>()
                 .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))

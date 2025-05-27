@@ -17,6 +17,7 @@ namespace OficinasMecanicas.Dominio.Interfaces.Repositorios
         Task<IList<Usuarios>> BuscarTodos();
         Task<Usuarios?> BuscarUsuarioPorId(Guid id);
         Task<Usuarios?> BuscarPorEmail(string email);
+        Task<Usuarios?> BuscarPorUsername(string username);
         Task<bool> EmailValidoLogin(string email);
         Task<bool> UsuarioNaoPossuiSenhaCadastrada(string email);
         Task<bool> SenhaValidaLogin(string email, string senha);

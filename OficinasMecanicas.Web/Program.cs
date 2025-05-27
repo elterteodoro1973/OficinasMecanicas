@@ -15,8 +15,6 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.Configure<EmailConfiguracao>(builder.Configuration.GetSection("EmailConfiguracao"));
 
 InjetorDependencias.ConfigurarContextosEFCore(builder.Services, connectionString);
-
-//InjetorDependencias.ConfigurarIdentity(builder.Services);
 InjetorDependencias.ConfigurarServicosERepositorios(builder.Services);
 
 builder.Services.AddDistributedMemoryCache();

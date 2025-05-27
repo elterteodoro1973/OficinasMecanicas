@@ -162,6 +162,23 @@ namespace OficinasMecanicas.Dados.Servicos
             });
         }
 
+
+
+        public async Task<Usuarios?> BuscarPorId(Guid usuarioId)
+        {
+           return await _usuarioRepositorio.BuscarUsuarioPorId(usuarioId);
+        }
+        public async Task<Usuarios?> BuscarPorEmail(string email)
+        {
+            return  await _usuarioRepositorio.BuscarPorEmail(email);
+        }
+        
+        public async Task<Usuarios?> BuscarPorUsername(string username)
+        {
+            return await _usuarioRepositorio.BuscarPorUsername(username);
+        }
+
+
         private async Task _ValidarInclusao(Usuarios usuario)
         {
             if (!ExecutarValidacao<CadastrarEditarUsuarioValidacao, Usuarios>(new CadastrarEditarUsuarioValidacao(), usuario)) return;
@@ -327,7 +344,6 @@ namespace OficinasMecanicas.Dados.Servicos
 
             if (_notificador.TemNotificacao()) return;
         }
-
 
         public async Task ResetarSenha(string caminho, string email)
         {

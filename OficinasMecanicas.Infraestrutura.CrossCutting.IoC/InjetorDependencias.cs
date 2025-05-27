@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Aplicacao.Parsers;
 using OficinasMecanicas.Aplicacao.Servicos;
@@ -11,6 +14,7 @@ using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
+using System.Text;
 
 namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
 {
@@ -77,6 +81,35 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
 
            
         }
+
+
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+        {
+            var jwtSection = configuration.GetSection("jwt");
+            var symmetricSecurityKey = configuration["jwt:secretKey"];
+
+            services.AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = configuration["jwt:issuer"],
+                    ValidAudience = configuration["jwt:audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(symmetricSecurityKey)),
+                    ClockSkew = TimeSpan.Zero,
+                };
+            });
+
+            return services;
+        }
+
 
     }
 }

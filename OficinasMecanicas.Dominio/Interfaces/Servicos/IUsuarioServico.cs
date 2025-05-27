@@ -13,6 +13,11 @@ namespace OficinasMecanicas.Dominio.Interfaces.Servicos
         Task Adicionar(string caminho, Usuarios usuario);
         Task Editar(Usuarios usuario);
         Task Excluir(Guid usuarioId);
+
+        Task<Usuarios?> BuscarPorId(Guid usuarioId);
+        Task<Usuarios?>  BuscarPorEmail(string email);
+        Task<Usuarios?> BuscarPorUsername(string Username);
+
         Task CadastrarSenha(string token, string email, string senha, string novaSenha);
         Task TrocarUsuarioLogado(Guid usuarioId); 
         void Logout();

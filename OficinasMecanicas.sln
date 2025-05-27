@@ -25,6 +25,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OficinasMecanicas.Web", "Of
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OficinasMecanicas.Dados", "OficinasMecanicas.Dados\OficinasMecanicas.Dados.csproj", "{27581C58-379A-4CA3-889E-26A20E781F67}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 - WebServicoAPI", "5 - WebServicoAPI", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServicoAPI", "WebServicoAPI\WebServicoAPI\WebServicoAPI.csproj", "{96C1F60F-B053-4BD8-A11F-D9487B8EE444}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,10 @@ Global
 		{27581C58-379A-4CA3-889E-26A20E781F67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27581C58-379A-4CA3-889E-26A20E781F67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27581C58-379A-4CA3-889E-26A20E781F67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96C1F60F-B053-4BD8-A11F-D9487B8EE444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96C1F60F-B053-4BD8-A11F-D9487B8EE444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96C1F60F-B053-4BD8-A11F-D9487B8EE444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96C1F60F-B053-4BD8-A11F-D9487B8EE444}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +71,7 @@ Global
 		{28BF6D5D-2F86-4BB8-BF88-193A5C9CCE71} = {EF7A849D-D26A-4ADB-8561-7B6170645408}
 		{C0420A3B-E29A-4D5B-B511-E9E1E4E6FD73} = {E8ACEAEC-E7D5-44A0-91FF-7C3DDF316C68}
 		{27581C58-379A-4CA3-889E-26A20E781F67} = {B46A2EE1-F054-4052-A316-1CB1737FD7DC}
+		{96C1F60F-B053-4BD8-A11F-D9487B8EE444} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68D8DE76-8F3F-47A7-993F-C48B34B4BB09}

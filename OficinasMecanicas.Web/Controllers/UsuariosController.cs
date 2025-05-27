@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using OficinasMecanicas.Aplicacao.DTO.Perfis;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Web.Configuracoes.Claims;
-using OficinasMecanicas.Web.ViewModels;
-using OficinasMecanicas.Web.ViewModels.Perfis;
 using OficinasMecanicas.Web.ViewModels.Usuarios;
 
 namespace OficinasMecanicas.Web.Controllers
@@ -255,30 +251,8 @@ namespace OficinasMecanicas.Web.Controllers
 
             return View(model);
         }
-        [HttpPost]
-        public async Task<IActionResult> Permissoes(Guid id, [FromBody] CadastrarPerfilUsuarioViewModel model)
-        {
-            if (id == Guid.Empty || model == null || !ModelState.IsValid)
-                return BadRequest();
-
-            try
-            {
-                var dto = _mapper.Map<CadastrarPerfilUsuarioDTO>(model);
-                var claims = ClaimsUtils.RecuperarListaTuplasModulosClaims();
-                dto.Claims = claims.Where(c => model.Permissoes.Contains(c.Item3)).Select(c => c.Item4).ToList();
-                
-
-                if (!OperacaoValida())
-                    return BadRequest(RecuperarListaErros());
-
-                return Ok("Permissões cadastradas com sucesso !");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Erro ao confirmar as alterações das permissões do usuário !" + ex.Message);
-            }
-        }
-
+        
+       
         [AllowAnonymous]
         public IActionResult EsqueciSenha()
         {
