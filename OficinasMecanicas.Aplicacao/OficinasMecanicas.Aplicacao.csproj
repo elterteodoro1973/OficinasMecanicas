@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="DTO\Relatorios\**" />
+    <Compile Remove="Enums\**" />
+    <EmbeddedResource Remove="DTO\Relatorios\**" />
+    <EmbeddedResource Remove="Enums\**" />
+    <None Remove="DTO\Relatorios\**" />
+    <None Remove="Enums\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OficinasMecanicas.Dominio\OficinasMecanicas.Dominio.csproj" />
+  </ItemGroup>
+
+</Project>
