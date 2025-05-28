@@ -12,7 +12,10 @@ namespace OficinasMecanicas.Web.Configuracoes.AutoMapper
         public MapearDTOParaViewModel()
         {
             CreateMap<UsuariosTelaInicialDTO, UsuariosViewModel>();
-            CreateMap<CadastrarEditarUsuarioDTO, CadastrarEditarUsuarioViewModel>();
+            CreateMap<CadastrarUsuarioDTO, CadastrarEditarUsuarioViewModel>();
+            CreateMap<EditarUsuarioDTO, CadastrarEditarUsuarioViewModel>();
+
+
             CreateMap<CadastrarNovaSenhaDTO, CadastrarNovaSenhaViewModel>()
                .ForMember(c => c.Email, m => m.MapFrom(c => c.Email))
                .ForMember(c => c.Token, m => m.MapFrom(c => c.Token))

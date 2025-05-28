@@ -1,12 +1,22 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
+using OficinasMecanicas.Aplicacao.Model;
+using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
-using OficinasMecanicas.Web.Configuracoes.Claims;
 using OficinasMecanicas.Web.ViewModels.Usuarios;
+using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Http;
+
 
 namespace OficinasMecanicas.Web.Controllers
 {
@@ -17,20 +27,23 @@ namespace OficinasMecanicas.Web.Controllers
         private readonly IResetarSenhaServico _resetarSenhaServico;
         private readonly INotificador _notificador;
         private readonly ILogger<UsuariosController> _logger;
-
+        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper; 
         private readonly IWebHostEnvironment _env;
+        
 
-        public UsuariosController(ILogger<UsuariosController> logger, IUsuarioAppServico usuarioAppServico, IResetarSenhaServico resetarSenhaServico,
+        public UsuariosController( ILogger<UsuariosController> logger, IUsuarioAppServico usuarioAppServico, IResetarSenhaServico resetarSenhaServico,
             IMapper mapper, INotificador notificador,         
-            IWebHostEnvironment env ) : base(notificador)
+            IWebHostEnvironment env, IConfiguration configuration) : base(notificador)
         {
+            
             _logger = logger;
             _usuarioAppServico = usuarioAppServico;
             _resetarSenhaServico = resetarSenhaServico;
             _notificador = notificador;
             _mapper = mapper;
             _env = env;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public async Task<IActionResult> Index(string? filtro, string? sort)
@@ -48,6 +61,7 @@ namespace OficinasMecanicas.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login()
         {
+            ViewBag.MensagemErro = string.Empty;
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 await _usuarioAppServico.Logout();
@@ -56,6 +70,36 @@ namespace OficinasMecanicas.Web.Controllers
 
             return View();
         }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> Login(LoginViewModel model)
+        {
+            ViewBag.MensagemErro = string.Empty;
+
+            if (!ModelState.IsValid)
+                return View(model);
+
+            if (!OperacaoValida())
+                return View(model);
+
+            var linkBase = "https://localhost:7174/";
+            var token = string.Empty;
+
+            
+            var respostaObjeto = await _usuarioAppServico.PostarRequisicao<LoginViewModel>(model,"api/auth/login");
+
+            if (!respostaObjeto.sucesso)
+            {
+                ViewBag.MensagemErro = respostaObjeto.mensagem;
+                return View(model);
+            }
+            await _usuarioAppServico.RegistrarLogin(respostaObjeto);
+
+            return RedirectToAction("Index", "Home");
+        }
+
 
         [AllowAnonymous]
         public async Task<IActionResult> Logout()
@@ -68,22 +112,6 @@ namespace OficinasMecanicas.Web.Controllers
             return View(nameof(Login));
         }
 
-        [AllowAnonymous]
-        [HttpPost]
-        [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> Login([Bind("Usuario, Senha")] LoginViewModel model)
-        {
-            if (!ModelState.IsValid)
-                return View(model);
-
-            await _usuarioAppServico.Login(_env.WebRootPath, model.Usuario, model.Senha);
-
-            if (!OperacaoValida())
-                return View(model);
-
-            return RedirectToAction("Index", "Home");
-
-        }
 
         [AllowAnonymous]
         public async Task<IActionResult> CadastrarNovaSenha(string? token)
@@ -121,29 +149,40 @@ namespace OficinasMecanicas.Web.Controllers
 
             TempData["Sucesso"] = "Senha cadastrada com sucesso !";
 
-            await _usuarioAppServico.Login(_env.WebRootPath, model.Email, model.Senha);
+            //await _usuarioAppServico.Login(_env.WebRootPath, model.Email, model.Senha);
 
             return RedirectToAction("Index", "Home");
         }
 
         public async Task<IActionResult> Adicionar()
         {
-            
+            ViewBag.MensagemErro = String.Empty;
             return View(new CadastrarEditarUsuarioViewModel() {Id = Guid.NewGuid() });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Adicionar([Bind("Nome, Email")] CadastrarEditarUsuarioViewModel model)
+        public async Task<IActionResult> Adicionar([Bind("Nome, Email,Senha")] CadastrarEditarUsuarioViewModel model)
         {
-            
+            ViewBag.MensagemErro = String.Empty;
+
 
             if (!ModelState.IsValid)
                 return View(model);
 
-            var usuario = _mapper.Map<CadastrarEditarUsuarioDTO>(model);
+            var usuario = _mapper.Map<CadastrarUsuarioDTO>(model);
 
-            await _usuarioAppServico.Cadastrar(_env.WebRootPath, usuario);
+            //await _usuarioAppServico.Adicionar(_env.WebRootPath, usuario);
+
+            var respostaObjeto = await _usuarioAppServico.PostarRequisicao<CadastrarUsuarioDTO>(usuario, "api/auth/register");
+
+            if (!respostaObjeto.sucesso)
+            {
+                ViewBag.MensagemErro = respostaObjeto.mensagem;
+                return View(model);
+            }
+            
+            //await _usuarioAppServico.RegistrarLogin(respostaObjeto);
 
             if (!OperacaoValida())
                 return View(model);
@@ -168,16 +207,14 @@ namespace OficinasMecanicas.Web.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Guid id, [Bind("Id, Nome,  Email")] CadastrarEditarUsuarioViewModel model)
-        {
-            
-
+        {    
             if (id != model.Id)
                 ModelState.AddModelError("", "Usuário Inválido !");
 
             if (!ModelState.IsValid)
                 return View(model);
 
-            var usuario = _mapper.Map<CadastrarEditarUsuarioDTO>(model);
+            var usuario = _mapper.Map<EditarUsuarioDTO>(model);
 
             await _usuarioAppServico.Editar(usuario);
 
@@ -187,9 +224,7 @@ namespace OficinasMecanicas.Web.Controllers
             TempData["Sucesso"] = "Usuário atualizado com sucesso !";
             return RedirectToAction(nameof(Index));
         }
-
-        
-
+          
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Excluir(Guid id)
@@ -214,45 +249,7 @@ namespace OficinasMecanicas.Web.Controllers
 
             return Ok("Usuário Excluido com sucesso !");
         }
-        public async Task<IActionResult> Permissoes(Guid id)
-        {
-            if (id == Guid.Empty)
-                return NotFound();
-
-            var usuario = await _usuarioAppServico.BuscarUsuarioPorId(id);
-
-            if (usuario == null)
-                return BadRequest();
-
-            var claims = ClaimsUtils.RecuperarListaTuplasModulosClaims();
-            ViewBag.Categorias = claims.GroupBy(c => c.Item1).Select(g => g.First()).Select(c => c.Item1).OrderBy(c => c).ToList();
-            ViewBag.ClaimModulos = claims;
-
-             
-            
-            Guid? perfilId = null;
-            //if (usuario.Administrador)
-            //{
-            //    var perfil = _mapper.Map<PerfilViewModel>(await _perfilAppServico.BuscarPerfilAdministrador());
-            //    perfilId = perfil.Id;
-            //}
-            
-            
-
-            var model = new CadastrarPerfilUsuarioViewModel
-            {
-                NomeUsuario = usuario.Nome,
-                Email = usuario.Email,
-                UsuarioId = id,
-                PerfilId = perfilId,
                
-
-            };
-
-            return View(model);
-        }
-        
-       
         [AllowAnonymous]
         public IActionResult EsqueciSenha()
         {
@@ -275,36 +272,7 @@ namespace OficinasMecanicas.Web.Controllers
             ViewBag.ExibirMensagemSucesso = true;
             return View();
         }
-
-        public async Task<IActionResult> BuscarPermissoesUsuario(Guid usuarioId)
-        {
-            if (usuarioId == Guid.Empty)
-                return BadRequest("Identificador do usuário inválido !");
-            
-            
-            try
-            {
-                //var dto = await _usuarioAppServico.BuscarPermissoesUsuarioCBHPorId(cbhId, usuarioId);
-
-                //if (dto == null)
-                //    return NotFound();
-
-                //var model = new BuscarPerfilEPermissoesUsuarioViewModel
-                //{
-                //    PerfilId = dto.PerfilId
-                //};
-                var claims = ClaimsUtils.RecuperarListaTuplasModulosClaims();
-                //model.Permissoes = claims.IntersectBy(dto.Permissoes.Select(c => new { c.Type, c.Value }), c => new { c.Item4.Type, c.Item4.Value }).Select(c => c.Item3).ToArray();
-
-                //return Ok(model);
-                return Ok(null);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Erro ao buscar as permissões do usuário !" + ex.Message);
-            }
-        }
-
+        
         public async Task<IActionResult> TrocarUsuarioLogado()
         {
             if (!BuscarUsuarioIdLogado().HasValue)

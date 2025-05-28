@@ -24,7 +24,6 @@ namespace OficinasMecanicas.Dominio.Entidades.Validacoes.Usuarios
                 .NotNull().WithMessage("O campo {PropertyName} precisa ser fornecido")
                 .NotEqual(string.Empty).WithMessage("O campo {PropertyName} não pode ser igual a {ComparisonValue}")
                 .MaximumLength(256).WithMessage("O campo {PropertyName} não pode ser maior que {MaxLength} caracteres");
-
            
 
         }

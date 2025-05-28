@@ -4,6 +4,7 @@ using System.Diagnostics;
 using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Web.ViewModels;
+using System.Security.Claims;
 
 
 namespace OficinasMecanicas.Web.Controllers
@@ -21,7 +22,6 @@ namespace OficinasMecanicas.Web.Controllers
 
         public IActionResult Index()
         {
-            //return RedirectToAction("Index", "Empreendimento");
             return View();
         }
 

@@ -4,9 +4,11 @@ namespace OficinasMecanicas.Web.ViewModels.Usuarios
 {
     public class LoginViewModel
     {
-        [Display(Name = "Usuário")]
+        [Display(Name = "Email")]
         [Required(ErrorMessage = "{0} é obrigatório !")]
-        public string Usuario { get; set; } = null!;
+        public string Email { get; set; } = null!;
+
+
         [Display(Name = "Senha")]
         [Required(ErrorMessage = "{0} é obrigatório !")]
         [DataType(DataType.Password)]

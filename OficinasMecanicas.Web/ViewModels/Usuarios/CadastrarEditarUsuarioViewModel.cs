@@ -16,6 +16,8 @@ namespace OficinasMecanicas.Web.ViewModels.Usuarios
         [Required(ErrorMessage = "{0} é obrigatório !")]
         public string Email { get; set; } = null!;
 
-        
+        public string? Senha { get; set; } = null!;
+
+        public string? ConfirmarSenha { get; set; } = null!;
     }
 }

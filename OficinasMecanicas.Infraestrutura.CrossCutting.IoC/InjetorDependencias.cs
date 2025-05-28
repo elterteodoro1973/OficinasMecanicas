@@ -39,7 +39,7 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
             services.AddScoped<IResetarSenhaRepositorio, ResetarSenhaRepositorio>();
 
             ////Servicos de Dominio           
-            services.AddScoped<IUsuarioServico, UsuarioServico>();           
+            services.AddScoped<IUsuariosServico, UsuarioServico>();           
             
             services.AddScoped<IResetarSenhaServico, ResetarSenhaServico>();
 
@@ -51,7 +51,7 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
             services.AddScoped<INotificador, Notificador>();
             //services.AddScoped<ILogServico, LogServico>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<IEmailServico, EmailServico>();
+            services.AddScoped<IEmailServico,EmailServico>();
         }
 
         public static void ConfigurarMensagensMVC(this IServiceCollection services)

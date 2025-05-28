@@ -19,6 +19,9 @@ namespace OficinasMecanicas.Dados.Contexto
         public virtual DbSet<Usuarios> Usuarios { get; set; }
         public virtual DbSet<ResetarSenha> ResetarSenha { get; set; }
 
+        public virtual DbSet<OficinaMecanica> OficinaMecanica { get; set; }
+        public virtual DbSet<ServicosPrestados> ServicosPrestados { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

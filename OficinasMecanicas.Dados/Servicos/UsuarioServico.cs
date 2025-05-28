@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using OficinasMecanicas.Dados.Repositorios;
 using OficinasMecanicas.Dominio.DTO;
 using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Entidades.Validacoes.Usuarios;
@@ -15,7 +16,7 @@ using System.Text;
 
 namespace OficinasMecanicas.Dados.Servicos
 {
-    public class UsuarioServico : BaseServico<Usuarios>, IUsuarioServico
+    public class UsuarioServico : BaseServico<Usuarios>, IUsuariosServico
     {
         private readonly IHttpContextAccessor _httpContext;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
@@ -41,11 +42,11 @@ namespace OficinasMecanicas.Dados.Servicos
             _emailServico = emailServico;
         }
 
-        public async Task Adicionar(string caminho, Usuarios usuario)
+        public async Task<Usuarios?> Adicionar(string caminho, Usuarios usuario)
         {
             await _ValidarInclusao(usuario);
 
-            if (_notificador.TemNotificacao()) return; 
+            if (_notificador.TemNotificacao()) return null;
             try
             {
                 usuario.Id = Guid.NewGuid();
@@ -64,18 +65,20 @@ namespace OficinasMecanicas.Dados.Servicos
                 await _resetarSenhaRepositorio.Adicionar(resetarSenhaDB);
 
                 var urlResetSenha = string.Concat(_httpContext.HttpContext.Request.Scheme, "://", _httpContext.HttpContext.Request.Host.Value, $"/Usuarios/CadastrarNovaSenha?token={resetarSenhaDB.Token}");
-                string textoEmail = _emailServico.GetCredenciasPrimeiroAcesso(caminho, usuario.Username, urlResetSenha);
+                string textoEmail = await _emailServico.GetCredenciasPrimeiroAcesso(caminho, usuario.Username, urlResetSenha);
                 await _emailServico.Enviar(usuario.Email, "Cadastrar Senha!", textoEmail);
 
-                
+                return usuario;
+
             }
             catch (Exception ex)
-            {                
+            {
                 _notificador.Adicionar(new Notificacao("Erro ao adicionar o Usuario !" + ex.Message));
+                return usuario;
             }
         }
 
-        public async Task Editar(Usuarios usuario)
+        public async Task Atualizar(Usuarios usuario)
         {
             await _ValidarEdicao(usuario);
 
@@ -119,64 +122,17 @@ namespace OficinasMecanicas.Dados.Servicos
             }
         }
 
-        public async Task Login(string caminho,  string email, string senha)
-        {
-            await _ValidarLogin(email, senha);
-
-            if (_notificador.TemNotificacao()) return;
-
-            var usuarioDB = await _usuarioRepositorio.BuscarPorEmail(email);
-
-            if (!await _usuarioRepositorio.SenhaValidaLogin(email, GetSha256Hash(senha)))
-            {
-                _notificador.Adicionar(new Notificacao("Senha inválida !"));
-                return;
-            }
-            else
-            {
-                
-                await Login(usuarioDB);
-            }
-        }
-        private async Task Login(Usuarios usuarioDB)
-        {
-            if (_httpContext.HttpContext.User.Identity != null && _httpContext.HttpContext.User.Identity.IsAuthenticated)
-            {
-                await _httpContext.HttpContext.SignOutAsync();
-                _httpContext.HttpContext.Session.Clear();
-            }
-
-            var identity = new ClaimsIdentity(CookieAuthenticationDefaults.AuthenticationScheme);
-            identity.AddClaim(new Claim("UsuarioId", usuarioDB.Id.ToString()));
-            identity.AddClaim(new Claim("NomeUsuario", usuarioDB.Username));
-
-
-            
-
-            var claimPrincipal = new ClaimsPrincipal(identity);
-            await _httpContext.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, claimPrincipal, new AuthenticationProperties
-            {
-                IsPersistent = false,
-                AllowRefresh = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(1)
-            });
-        }
-
-
-
-        public async Task<Usuarios?> BuscarPorId(Guid usuarioId)
-        {
-           return await _usuarioRepositorio.BuscarUsuarioPorId(usuarioId);
-        }
-        public async Task<Usuarios?> BuscarPorEmail(string email)
-        {
-            return  await _usuarioRepositorio.BuscarPorEmail(email);
-        }
+        public async Task<Usuarios?> BuscarPorId(Guid id)=> await _usuarioRepositorio.BuscarUsuarioPorId(id);
         
-        public async Task<Usuarios?> BuscarPorUsername(string username)
-        {
-            return await _usuarioRepositorio.BuscarPorUsername(username);
-        }
+        public async Task<Usuarios?> BuscarPorEmail(string email)=> await _usuarioRepositorio.BuscarPorEmail(email);
+                
+        public async Task<Usuarios?> BuscarPorUsername(string username)=> await _usuarioRepositorio.BuscarPorUsername(username);
+        
+        public async Task<bool> SenhaValidaLogin(string email, string senha) => await _usuarioRepositorio.SenhaValidaLogin(email, GetSha256Hash(senha));
+
+        public async Task<bool> NomePrincipalJaCadastrado(string nome, Guid? id) => await _usuarioRepositorio.NomePrincipalJaCadastrado(nome, id);
+
+        public async Task<bool> EmailPrincipalJaCadastrado(string email, Guid? id) => await _usuarioRepositorio.NomePrincipalJaCadastrado(email, id);
 
 
         private async Task _ValidarInclusao(Usuarios usuario)
@@ -212,46 +168,51 @@ namespace OficinasMecanicas.Dados.Servicos
             if (usuarioId == Guid.Empty)
             {
                 _notificador.Adicionar(new Notificacao("Identificador de Usuário obrigatório !"));
-            }
-            
+            }            
         }
 
-        private string GetSha256Hash(string input)
+        public string GetSha256Hash(string input)
         {
             var byteValue = Encoding.UTF8.GetBytes(input);
             var byteHash = SHA256.HashData(byteValue);
             return Convert.ToBase64String(byteHash);
         }
-
-        public void Logout()
+        public static string GerarHash512(string chave)
         {
-            if (_httpContext.HttpContext.User.Identity != null && _httpContext.HttpContext.User.Identity.IsAuthenticated)
-            {
-                _httpContext.HttpContext.SignOutAsync();
-                _httpContext.HttpContext.Session.Clear();
-            }
-        }
+            byte[] saltBytes = null;
 
-        private async Task _ValidarLogin(string email, string senha)
-        {
-            if (string.IsNullOrEmpty(email) || string.IsNullOrWhiteSpace(email))
-                _notificador.Adicionar(new Notificacao("E-mail é obrigatório !"));
+            int minSaltSize = 4;
+            int maxSaltSize = 8;
 
-            if (string.IsNullOrEmpty(senha) || string.IsNullOrWhiteSpace(senha))
-                _notificador.Adicionar(new Notificacao("Senha é obrigatório !"));
+            Random random = new Random();
+            int saltSize = random.Next(minSaltSize, maxSaltSize);
 
-            if (_notificador.TemNotificacao()) return;
+            saltBytes = new byte[saltSize];
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+            rng.GetNonZeroBytes(saltBytes);
 
-            if (!await _usuarioRepositorio.EmailValidoLogin(email))
-            {
-                _notificador.Adicionar(new Notificacao("E-mail é inválido !"));
-                return;
-            }
+            byte[] plainTextBytes = Encoding.UTF8.GetBytes(chave);
+            byte[] plainTextWithSaltBytes = new byte[plainTextBytes.Length + saltBytes.Length];
 
-            var usuario = await _usuarioRepositorio.BuscarPorEmail(email);
+            for (int i = 0; i < plainTextBytes.Length; i++)
+                plainTextWithSaltBytes[i] = plainTextBytes[i];
 
-            
+            for (int i = 0; i < saltBytes.Length; i++)
+                plainTextWithSaltBytes[plainTextBytes.Length + i] = saltBytes[i];
 
+            HashAlgorithm hash = new SHA512Managed();
+            byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
+            byte[] hashWithSaltBytes = new byte[hashBytes.Length + saltBytes.Length];
+
+            for (int i = 0; i < hashBytes.Length; i++)
+                hashWithSaltBytes[i] = hashBytes[i];
+
+            for (int i = 0; i < saltBytes.Length; i++)
+                hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
+
+            string hashValue = Convert.ToBase64String(hashWithSaltBytes);
+
+            return hashValue;
         }
 
         public async Task CadastrarSenha(string token, string email, string senha, string confirmarSenha)
@@ -278,7 +239,7 @@ namespace OficinasMecanicas.Dados.Servicos
                 _notificador.Adicionar(new Notificacao("Erro ao cadastrar a nova senha do usuário !" + ex.Message));
             }
 
-            await Login(usuarioDB);
+            //await Login(usuarioDB);
         }
 
         private async Task _ValidarCadastroNovaSenha(string token, string email, string senha, string confirmarSenha)
@@ -369,7 +330,7 @@ namespace OficinasMecanicas.Dados.Servicos
                 await _resetarSenhaRepositorio.Adicionar(resetarSenhaDB);
 
                 var urlResetSenha = string.Concat(_httpContext.HttpContext.Request.Scheme, "://", _httpContext.HttpContext.Request.Host.Value, $"/Usuarios/CadastrarNovaSenha?token={resetarSenhaDB.Token}");
-                string textoEmail = _emailServico.GetTextoResetSenha(caminho, usuarioDB.Username, urlResetSenha);
+                string textoEmail = await _emailServico.GetTextoResetSenha(caminho, usuarioDB.Username, urlResetSenha);
                 await _emailServico.Enviar(email, "Resetar Senha!", textoEmail);               
             }
             catch (Exception ex)
@@ -380,44 +341,7 @@ namespace OficinasMecanicas.Dados.Servicos
             return;
         }        
         
-        public static string GerarHash512(string chave)
-        {
-            byte[] saltBytes = null;
-
-            int minSaltSize = 4;
-            int maxSaltSize = 8;
-
-            Random random = new Random();
-            int saltSize = random.Next(minSaltSize, maxSaltSize);
-
-            saltBytes = new byte[saltSize];
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            rng.GetNonZeroBytes(saltBytes);
-
-            byte[] plainTextBytes = Encoding.UTF8.GetBytes(chave);
-            byte[] plainTextWithSaltBytes = new byte[plainTextBytes.Length + saltBytes.Length];
-
-            for (int i = 0; i < plainTextBytes.Length; i++)
-                plainTextWithSaltBytes[i] = plainTextBytes[i];
-
-            for (int i = 0; i < saltBytes.Length; i++)
-                plainTextWithSaltBytes[plainTextBytes.Length + i] = saltBytes[i];
-
-            HashAlgorithm hash = new SHA512Managed();
-            byte[] hashBytes = hash.ComputeHash(plainTextWithSaltBytes);
-            byte[] hashWithSaltBytes = new byte[hashBytes.Length + saltBytes.Length];
-
-            for (int i = 0; i < hashBytes.Length; i++)
-                hashWithSaltBytes[i] = hashBytes[i];
-
-            for (int i = 0; i < saltBytes.Length; i++)
-                hashWithSaltBytes[hashBytes.Length + i] = saltBytes[i];
-
-            string hashValue = Convert.ToBase64String(hashWithSaltBytes);
-
-            return hashValue;
-        }
-
+        
         private async Task _ValidarReseteSenha(string email)
         {
             if (string.IsNullOrEmpty(email) || string.IsNullOrWhiteSpace(email))
@@ -453,6 +377,6 @@ namespace OficinasMecanicas.Dados.Servicos
             }
         }
 
-        
+       
     }
 }

@@ -18,13 +18,16 @@ namespace OficinasMecanicas.Aplicacao.Parsers
                 .ForMember(c => c.Username, m => m.MapFrom(c => c.Username))
                 .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
 
-            CreateMap<Usuarios, CadastrarEditarUsuarioDTO>()
+            CreateMap<Usuarios, CadastrarUsuarioDTO>()                
+                .ForMember(c => c.Nome, m => m.MapFrom(c => c.Username))
+                .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
+
+            CreateMap<Usuarios, EditarUsuarioDTO>()
                 .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
                 .ForMember(c => c.Nome, m => m.MapFrom(c => c.Username))
                 .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
 
-           
-           
+
         }
     }
 }

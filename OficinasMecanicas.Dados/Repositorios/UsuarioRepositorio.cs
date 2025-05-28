@@ -34,16 +34,11 @@ namespace OficinasMecanicas.Dados.Repositorios
         public async Task<Usuarios?> Excluir(Guid id, CancellationToken cancellationToken = default)
         {
             var usuario = await _contexto.Usuarios.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-
             if (usuario == null)
             {
                 throw new InvalidOperationException("Usuário não encontrado.");
-            }
-
-            // Remove o usuário do Data Context
-            _contexto.Usuarios.Remove(usuario);
-
-            // Persiste as mudanças
+            }            
+            _contexto.Usuarios.Remove(usuario);            
             await _contexto.SaveChangesAsync(cancellationToken);
 
             return usuario;
