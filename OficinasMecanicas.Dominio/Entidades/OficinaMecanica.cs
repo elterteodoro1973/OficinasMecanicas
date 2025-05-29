@@ -1,5 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace OficinasMecanicas.Dominio.Entidades;
 
@@ -18,4 +21,7 @@ public partial class OficinaMecanica
 
     [Unicode(false)]
     public string? Servicos { get; set; }
+
+    [InverseProperty("IdOficinaNavigation")]
+    public virtual ICollection<AgendamentoVisita> AgendamentoVisita { get; set; } = new List<AgendamentoVisita>();
 }

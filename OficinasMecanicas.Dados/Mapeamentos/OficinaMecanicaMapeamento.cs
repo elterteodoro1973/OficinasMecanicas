@@ -9,10 +9,6 @@ using System.Threading.Tasks;
 
 namespace OficinasMecanicas.Dados.Mapeamentos
 {
-    //internal class OficinaMecanicaMapeamento
-    //{
-    //}
-
     public class OficinaMecanicaMapeamento : IEntityTypeConfiguration<OficinaMecanica>
     {
         public void Configure(EntityTypeBuilder<OficinaMecanica> builder)

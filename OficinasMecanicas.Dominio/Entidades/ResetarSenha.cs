@@ -1,16 +1,24 @@
-﻿#nullable disable
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace OficinasMecanicas.Dominio.Entidades;
 
-public partial class ResetarSenha : EntidadeBase
-{   
-    public String Token { get; set; }
+public partial class ResetarSenha
+{
+    [Key]
+    public Guid Id { get; set; }
+
+    [StringLength(150)]
+    [Unicode(false)]
+    public string? Token { get; set; }
 
     public Guid UsuarioId { get; set; }
 
     [Column(TypeName = "datetime")]
-    public DateTime? DataSolicitacao { get; set; }
+    public DateTime DataSolicitacao { get; set; }
 
     [Column(TypeName = "datetime")]
     public DateTime DataExpiracao { get; set; }
@@ -21,5 +29,5 @@ public partial class ResetarSenha : EntidadeBase
 
     [ForeignKey("UsuarioId")]
     [InverseProperty("ResetarSenha")]
-    public virtual Usuarios IdUsuarioNavigation { get; set; }
+    public virtual Usuarios Usuario { get; set; } = null!;
 }

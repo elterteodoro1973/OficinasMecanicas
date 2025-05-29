@@ -59,6 +59,12 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return dtos;
         }
 
+        public async Task<IList<UsuariosTelaInicialDTO>> BuscarTodos()
+        {
+            var dtos = _mapper.Map<IList<UsuariosTelaInicialDTO>>(await _usuarioRepositorio.BuscarTodos());
+            return dtos;
+        }
+
 
         public async Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint)
         {

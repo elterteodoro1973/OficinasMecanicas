@@ -18,7 +18,7 @@ namespace OficinasMecanicas.Dados.Mapeamentos
             builder.Property(e => e.Efetivado).HasDefaultValue(false);
             builder.Property(e => e.Excluido).HasDefaultValue(false);
 
-            builder.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ResetarSenha)
+            builder.HasOne(d => d.Usuario).WithMany(p => p.ResetarSenha)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ResetarSenha_Usuarios");
         }

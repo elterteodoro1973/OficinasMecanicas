@@ -91,7 +91,7 @@ namespace OficinasMecanicas.Dados.Servicos
 
             if (_notificador.TemNotificacao()) return;
 
-            var agendaUsuarioOficina = await _AgendamentoVisitaRepositorio.BuscarPorDatas(agenda.DataHora, agenda.DataHora);            
+            var agendaUsuarioOficina = await _AgendamentoVisitaRepositorio.BuscarPorDatas(agenda.DataHora.Value, agenda.DataHora.Value);            
             if (agendaUsuarioOficina != null)
             {               
                 var agendaUsuario = agendaUsuarioOficina.Where(c => c.IdUsuario == agenda.IdUsuario).Any();
@@ -101,7 +101,7 @@ namespace OficinasMecanicas.Dados.Servicos
                     return;
                 }
 
-                var agendaOficinas = agendaUsuarioOficina.Where(c => c.IdOficina == agenda.IdOficina &&  c.DataHora.Hour == agenda.DataHora.Hour).Count();
+                var agendaOficinas = agendaUsuarioOficina.Where(c => c.IdOficina == agenda.IdOficina &&  c.DataHora.Value.Hour == agenda.DataHora.Value.Hour).Count();
 
                 if (agendaOficinas > 2 )
                 {
@@ -116,7 +116,7 @@ namespace OficinasMecanicas.Dados.Servicos
 
             if (_notificador.TemNotificacao()) return;
 
-            var agendaUsuarioOficina = await _AgendamentoVisitaRepositorio.BuscarPorDatas(agenda.DataHora, agenda.DataHora);
+            var agendaUsuarioOficina = await _AgendamentoVisitaRepositorio.BuscarPorDatas(agenda.DataHora.Value, agenda.DataHora.Value);
             if (agendaUsuarioOficina != null)
             {
                 var agendaUsuario = agendaUsuarioOficina.Where(c => c.IdUsuario == agenda.IdUsuario).Any();
@@ -126,7 +126,7 @@ namespace OficinasMecanicas.Dados.Servicos
                     return;
                 }
 
-                var agendaOficinas = agendaUsuarioOficina.Where(c => c.IdOficina == agenda.IdOficina && c.DataHora.Hour == agenda.DataHora.Hour).Count();
+                var agendaOficinas = agendaUsuarioOficina.Where(c => c.IdOficina == agenda.IdOficina && c.DataHora.Value.Hour == agenda.DataHora.Value.Hour).Count();
 
                 if (agendaOficinas > 2)
                 {

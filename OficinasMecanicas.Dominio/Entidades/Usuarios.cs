@@ -1,31 +1,31 @@
-﻿#nullable disable
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
+namespace OficinasMecanicas.Dominio.Entidades;
 
-namespace OficinasMecanicas.Dominio.Entidades
+public partial class Usuarios
 {
-    public partial class Usuarios : EntidadeBase
-    {
-        [StringLength(512)]
-        public string Email { get; set; }
+    [Key]
+    public Guid Id { get; set; }
 
-        public string PasswordHash { get; set; }
+    [StringLength(100)]
+    [Unicode(false)]
+    public string? Username { get; set; }
 
-        [StringLength(256)]
-        [Unicode(false)]
-        public string Username { get; set; }
+    [StringLength(512)]
+    [Unicode(false)]
+    public string? PasswordHash { get; set; }
 
+    [StringLength(256)]
+    [Unicode(false)]
+    public string? Email { get; set; }
 
-        //[InverseProperty("IdUsuarioNavigation")]
-        //public virtual ICollection<ResetarSenha> ResetarSenha { get; set; } = new List<ResetarSenha>();
+    [InverseProperty("IdUsuarioNavigation")]
+    public virtual ICollection<AgendamentoVisita> AgendamentoVisita { get; set; } = new List<AgendamentoVisita>();
 
-        [InverseProperty("IdUsuarioNavigation")]
-        public virtual ICollection<AgendamentoVisita> AgendamentoVisita { get; set; } = new List<AgendamentoVisita>();
-
-        [InverseProperty("Usuario")]
-        public virtual ICollection<ResetarSenha> ResetarSenha { get; set; } = new List<ResetarSenha>();
-
-    }
+    [InverseProperty("Usuario")]
+    public virtual ICollection<ResetarSenha> ResetarSenha { get; set; } = new List<ResetarSenha>();
 }

@@ -13,7 +13,7 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
 {
     public interface IUsuarioAppServico
     {
-        Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro);
+        
         Task Logout();
         Task RegistrarLogin(Resposta<UserToken> resposta);
         Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint);
@@ -21,6 +21,10 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         Task Atualizar(EditarUsuarioDTO dto);
 
         Task Excluir(Guid id);
+
+        Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro);
+
+        Task<IList<UsuariosTelaInicialDTO>> BuscarTodos();
         Task<LoginUsuarioDTO?> BuscarPorId(Guid usuarioId);
         Task<LoginUsuarioDTO?> BuscarPorEmail(string email);
         Task<LoginUsuarioDTO?> BuscarPorUsername(string username);

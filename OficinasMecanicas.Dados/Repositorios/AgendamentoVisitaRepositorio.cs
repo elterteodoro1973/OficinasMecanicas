@@ -3,13 +3,11 @@ using Microsoft.Extensions.Logging;
 using OficinasMecanicas.Dados.Contexto;
 using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OficinasMecanicas.Dados.Repositorios
 {
     public class AgendamentoVisitaRepositorio : IAgendamentoVisitaRepositorio
     {
-
         private readonly DbContexto _contexto;
         readonly ILogger<UsuarioRepositorio> _logger;
         public AgendamentoVisitaRepositorio(DbContexto contexto, ILogger<UsuarioRepositorio> _logger)
@@ -47,25 +45,13 @@ namespace OficinasMecanicas.Dados.Repositorios
 
         public async Task<AgendamentoVisita?> BuscarPorId(Guid id)
         => await _contexto.AgendamentoVisita.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync();
+        public async Task<IEnumerable<AgendamentoVisita>> BuscarTodos()=> await _contexto.AgendamentoVisita.AsNoTracking().ToListAsync();
 
+        public async Task<IList<AgendamentoVisita>?> BuscarPorDescricao(string descricao) => await _contexto.AgendamentoVisita.
+            Where(c => c.Descricao.ToLower().Contains(descricao.ToLower())).ToListAsync();       
         
-        public async Task<IEnumerable<AgendamentoVisita>> BuscarTodos()
-         => await _contexto.AgendamentoVisita.AsNoTracking().ToListAsync();
-
-
-        public async Task<IList<AgendamentoVisita>?> BuscarPorDescricao(string descricao)
-        {
-            return await _contexto.AgendamentoVisita.Where(c => c.Descricao.ToLower().Contains(descricao.ToLower())).ToListAsync();
-        }
-        
-        public async Task<IList<AgendamentoVisita>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)
-        {            
-            return await _contexto.AgendamentoVisita
-                .Where(c => c.DataHora.Date >= dtInicio.Date && c.DataHora.Date <= dtfinal.Date)
-                .ToListAsync();
-        }
-
-        
+        public async Task<IList<AgendamentoVisita>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)=> await _contexto.AgendamentoVisita
+                .Where(c => c.DataHora.Value.Date >= dtInicio.Date && c.DataHora.Value.Date <= dtfinal.Date).ToListAsync();
     }
 
 }
