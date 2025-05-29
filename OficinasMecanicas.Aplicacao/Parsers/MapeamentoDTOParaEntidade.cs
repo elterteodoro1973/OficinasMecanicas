@@ -31,6 +31,25 @@ namespace OficinasMecanicas.Aplicacao.Parsers
                .ForMember(c => c.Username, m => m.MapFrom(c => c.Nome))
                .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
 
+            // Mapear Oficinas
+            CreateMap<OficinasTelaInicialDTO, OficinaMecanica>()
+                .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
+                .ForMember(c => c.Nome, m => m.MapFrom(c => c.Nome))
+                .ForMember(c => c.Endereco, m => m.MapFrom(c => c.Endereco))
+                .ForMember(c => c.Servicos, m => m.MapFrom(c => c.Servicos));           
+
+            CreateMap<CadastrarOficinaDTO, OficinaMecanica>()                
+                .ForMember(c => c.Nome, m => m.MapFrom(c => c.Nome))
+                .ForMember(c => c.Endereco, m => m.MapFrom(c => c.Endereco))
+                .ForMember(c => c.Servicos, m => m.MapFrom(c => c.Servicos));
+
+            CreateMap<EditarOficinaDTO, OficinaMecanica>()
+               .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
+               .ForMember(c => c.Nome, m => m.MapFrom(c => c.Nome))
+                .ForMember(c => c.Endereco, m => m.MapFrom(c => c.Endereco))
+                .ForMember(c => c.Servicos, m => m.MapFrom(c => c.Servicos));
+
+
             // Mapear agendamento
             CreateMap<AgendamentosVisitasTelaInicialDTO, AgendamentoVisita>()
                     .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))

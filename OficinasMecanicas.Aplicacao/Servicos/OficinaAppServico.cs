@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using OficinasMecanicas.Aplicacao.DTO.Oficinas;
+using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Interfaces;
@@ -47,15 +48,24 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return _mapper.Map<EditarOficinaDTO>(oficina);
         }        
 
-        public async Task<EditarOficinaDTO?> Atualizar(EditarOficinaDTO? dto)
-        {
-            if (dto == null || !dto.Id.HasValue)
+        public async Task<EditarOficinaDTO?> Atualizar(Guid id,  CadastrarOficinaDTO? dto)
+        {            
+            if (dto == null || id == null )
             {
-                _notificador.Adicionar(new Notificacao("Oficiona inválida !"));
+                _notificador.Adicionar(new Notificacao("Oficina inválida !"));
                 return null;
             }
+            
+            var oficinaEnvio = await _oficinaMecanicaServico.BuscarPorId(id);
+            if (oficinaEnvio == null )
+            {
+                _notificador.Adicionar(new Notificacao("Oficina não encontrada !"));
+                return null;
+            }
+
             var oficina = _mapper.Map<OficinaMecanica>(dto);
-            await _oficinaMecanicaServico.Atualizar(oficina);
+            oficina.Id = id;
+            await _oficinaMecanicaServico.Atualizar(id,oficina);
             return _mapper.Map<EditarOficinaDTO>(oficina);
         }
 

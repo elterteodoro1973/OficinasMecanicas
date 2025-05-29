@@ -12,13 +12,13 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
     public interface IAgendaVisitaAppServico
     {
         Task<EditarAgendamentoVisitaDTO?> Adicionar(CadastrarAgendamentoVisitaDTO dto);
-        Task<EditarAgendamentoVisitaDTO?> Atualizar(EditarAgendamentoVisitaDTO? dto);
+        Task<EditarAgendamentoVisitaDTO?> Atualizar(Guid id , CadastrarAgendamentoVisitaDTO? dto);
         Task<bool> Excluir(Guid id);
 
         Task<IList<AgendamentosVisitasTelaInicialDTO>> ListarAgendamentoVisitasTelaInicial(string? filtro);
         Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>> BuscarTodos();
         Task<EditarAgendamentoVisitaDTO?> BuscarPorId(Guid id);
-        Task<IList<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal);
-        Task<IList<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDescricao(string descricao);
+        Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal);
+        Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDescricao(string descricao);
     }
 }

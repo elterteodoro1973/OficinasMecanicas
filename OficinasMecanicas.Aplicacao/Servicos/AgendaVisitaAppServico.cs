@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace OficinasMecanicas.Aplicacao.Servicos
 {
@@ -47,15 +48,16 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             var novoUsuario = await _agendamentoVisitaServico.Adicionar(agendamentoVisita);
             return _mapper.Map<EditarAgendamentoVisitaDTO>(agendamentoVisita);
         }
-        public async Task<EditarAgendamentoVisitaDTO?> Atualizar(EditarAgendamentoVisitaDTO? dto)
+        public async Task<EditarAgendamentoVisitaDTO?> Atualizar(Guid id, CadastrarAgendamentoVisitaDTO? dto)
         {
-            if (dto == null || !dto.Id.HasValue)
+            if (dto == null || id == null)
             {
                 _notificador.Adicionar(new Notificacao("Oficiona inválida !"));
                 return null;
             }
             var oficina = _mapper.Map<AgendamentoVisita>(dto);
-            await _agendamentoVisitaServico.Atualizar(oficina);
+            oficina.Id = id;
+            await _agendamentoVisitaServico.Atualizar(id,oficina);
             return _mapper.Map<EditarAgendamentoVisitaDTO>(oficina);
         }
         public async Task<bool> Excluir(Guid id)
@@ -69,18 +71,31 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return dtos;
         }
         public async Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>> BuscarTodos()
+        {  
+            var listaAgenda = await _agendamentoVisitaServico.BuscarTodos();
+            var agendaResult = listaAgenda.Select(a => new AgendamentosVisitasTelaInicialDTO
+            {
+                Id = a.Id,
+                IdUsuario = a.IdUsuario.Value,
+                IdOficina = a.IdOficina.Value,
+                NomeUsuario = a.IdUsuarioNavigation?.Username ?? "Usuário não encontrado",
+                NomeOficina = a.IdOficinaNavigation?.Nome ?? "Oficina não encontrada",
+                DataHora = a.DataHora.Value,
+                Descricao = a.Descricao
+
+            }).ToList();
+
+            return agendaResult;
+        }
+
+        public async Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)
         {
-            var dtos = _mapper.Map<IList<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarTodos());
+            var dtos = _mapper.Map<IEnumerable<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarPorDatas(dtInicio, dtfinal));
             return dtos;
         }
-        public async Task<IList<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)
+        public async Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDescricao(string descricao)
         {
-            var dtos = _mapper.Map<IList<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarPorDatas(dtInicio, dtfinal));
-            return dtos;
-        }
-        public async Task<IList<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDescricao(string descricao)
-        {
-            var dtos = _mapper.Map<IList<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarPorDescricao(descricao));
+            var dtos = _mapper.Map<IEnumerable<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarPorDescricao(descricao));
             return dtos;
         }
     }

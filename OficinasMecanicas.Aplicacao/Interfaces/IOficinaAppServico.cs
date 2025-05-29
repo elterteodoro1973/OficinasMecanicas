@@ -12,7 +12,7 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
     public interface IOficinaAppServico
     {
         Task<EditarOficinaDTO?> Adicionar(CadastrarOficinaDTO dto);
-        Task<EditarOficinaDTO?> Atualizar(EditarOficinaDTO? dto);
+        Task<EditarOficinaDTO?> Atualizar(Guid id, CadastrarOficinaDTO? dto);
         Task<bool> Excluir(Guid id);
 
         Task<IList<OficinasTelaInicialDTO>> ListarOficionasTelaInicial(string? filtro);

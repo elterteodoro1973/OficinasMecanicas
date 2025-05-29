@@ -5,6 +5,7 @@ using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
+using System.Runtime.CompilerServices;
 
 namespace OficinasMecanicas.Dados.Servicos
 {
@@ -25,12 +26,11 @@ namespace OficinasMecanicas.Dados.Servicos
         }
         public async Task<AgendamentoVisita?> Adicionar(AgendamentoVisita agenda)
         {
-            await _ValidarInclusao(agenda);
-            if (_notificador.TemNotificacao()) return null;
-
             try
             {
                 agenda.Id = Guid.NewGuid();
+                await _ValidarInclusao(agenda);
+                if (_notificador.TemNotificacao()) return null;
                 await _AgendamentoVisitaRepositorio.Adicionar(agenda);
                 return agenda;
             }
@@ -41,19 +41,26 @@ namespace OficinasMecanicas.Dados.Servicos
             }
         }
 
-        public async Task Atualizar(AgendamentoVisita agenda)
+        public async Task Atualizar(Guid id , AgendamentoVisita agenda)
         {
-            await _ValidarEdicao(agenda);
-
-            if (_notificador.TemNotificacao()) return;
-
-            var agendaDB = await _AgendamentoVisitaRepositorio.BuscarPorId(agenda.Id);
-
+            
             try
             {
+                var agendaDB = await _AgendamentoVisitaRepositorio.BuscarPorId(id);
+
+                if (agendaDB == null)
+                {
+                    _notificador.Adicionar(new Notificacao("Agendamento não encontrada!"));
+                    return;
+                }
+                await _ValidarEdicao(agenda);
+
+                if (_notificador.TemNotificacao()) return;
+
                 agendaDB.Descricao = agenda.Descricao;
                 agendaDB.DataHora = agenda.DataHora;
                 agendaDB.IdUsuario = agenda.IdUsuario;
+                agendaDB.IdOficina = agenda.IdOficina;
                 await _AgendamentoVisitaRepositorio.Atualizar(agendaDB);
             }
             catch (Exception ex)
@@ -71,7 +78,7 @@ namespace OficinasMecanicas.Dados.Servicos
             var agendaDB = await _AgendamentoVisitaRepositorio.BuscarPorId(id);
             if (agendaDB == null)
             {
-                _notificador.Adicionar(new Notificacao("Oficiona não encontrada!"));
+                _notificador.Adicionar(new Notificacao("Agendamento não encontrada!"));
                 return;
             }
 
@@ -81,7 +88,7 @@ namespace OficinasMecanicas.Dados.Servicos
             }
             catch (Exception ex)
             {
-                _notificador.Adicionar(new Notificacao("Erro ao excluir a oficiona !"));
+                _notificador.Adicionar(new Notificacao("Erro ao excluir o  Agendamento !"));
             }
         }
 
@@ -147,11 +154,11 @@ namespace OficinasMecanicas.Dados.Servicos
         public async Task<IEnumerable<AgendamentoVisita>> BuscarTodos() => await _AgendamentoVisitaRepositorio.BuscarTodos();
         public async Task<AgendamentoVisita?> BuscarPorId(Guid id) => await _AgendamentoVisitaRepositorio.BuscarPorId(id);
 
-        public async Task<IList<AgendamentoVisita>?> BuscarPorDescricao(string descricao)
+        public async Task<IEnumerable<AgendamentoVisita>?> BuscarPorDescricao(string descricao)
         {
             return await _AgendamentoVisitaRepositorio.BuscarPorDescricao(descricao);
         }
-        public async Task<IList<AgendamentoVisita>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)
+        public async Task<IEnumerable<AgendamentoVisita>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal)
         {
             return await _AgendamentoVisitaRepositorio.BuscarPorDatas(dtInicio, dtfinal);
         }

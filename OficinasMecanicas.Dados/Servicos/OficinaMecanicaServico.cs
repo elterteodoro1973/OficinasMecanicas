@@ -25,12 +25,11 @@ namespace OficinasMecanicas.Dados.Servicos
         }
         public async Task<OficinaMecanica?> Adicionar(OficinaMecanica oficina)
         {
-            await _ValidarInclusao(oficina);
-            if (_notificador.TemNotificacao()) return null;
-
             try
             {
                oficina.Id = Guid.NewGuid();
+               await _ValidarInclusao(oficina);
+               if (_notificador.TemNotificacao()) return null;               
                await _oficinaMecanicaRepositorio.Adicionar(oficina);
                return oficina;
             }
@@ -41,13 +40,13 @@ namespace OficinasMecanicas.Dados.Servicos
             }
         }
 
-        public async Task Atualizar(OficinaMecanica oficina)
-        {
+        public async Task Atualizar(Guid id ,OficinaMecanica oficina)
+        {            
             await _ValidarEdicao(oficina);
 
             if (_notificador.TemNotificacao()) return;
 
-            var oficinaDB = await _oficinaMecanicaRepositorio.BuscarPorId(oficina.Id);
+            var oficinaDB = await _oficinaMecanicaRepositorio.BuscarPorId(id);
 
             try
             {

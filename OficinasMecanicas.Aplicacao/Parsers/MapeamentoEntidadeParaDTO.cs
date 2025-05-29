@@ -29,8 +29,14 @@ namespace OficinasMecanicas.Aplicacao.Parsers
                 .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
                 .ForMember(c => c.Nome, m => m.MapFrom(c => c.Username))
                 .ForMember(c => c.Email, m => m.MapFrom(c => c.Email));
-            
+
             // Mapear Oficinas
+            CreateMap<OficinaMecanica, OficinasTelaInicialDTO>()
+                .ForMember(c => c.Id, m => m.MapFrom(c => c.Id))
+               .ForMember(c => c.Nome, m => m.MapFrom(c => c.Nome))
+               .ForMember(c => c.Endereco, m => m.MapFrom(c => c.Endereco))
+               .ForMember(c => c.Servicos, m => m.MapFrom(c => c.Servicos));
+
             CreateMap<OficinaMecanica, CadastrarOficinaDTO>()
                .ForMember(c => c.Nome, m => m.MapFrom(c => c.Nome))
                .ForMember(c => c.Endereco, m => m.MapFrom(c => c.Endereco))

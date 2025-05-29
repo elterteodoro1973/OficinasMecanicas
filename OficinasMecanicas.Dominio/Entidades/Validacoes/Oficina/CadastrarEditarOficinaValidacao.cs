@@ -15,15 +15,14 @@ namespace OficinasMecanicas.Dominio.Entidades.Validacoes.Oficina
         {
             if (validarIdentificador)
             {
-                RuleFor(c => c.Id)
-                    .NotEqual(Guid.Empty).WithMessage("O campor identificador da oficiona não pode ser vazio");
+               RuleFor(c => c.Id)
+               .NotEqual(Guid.Empty).WithMessage("O campor identificador da oficiona não pode ser vazio");
             }
 
             RuleFor(c => c.Nome)
                 .NotNull().WithMessage("O campo {PropertyName} precisa ser fornecido")
                 .NotEqual(string.Empty).WithMessage("O campo {PropertyName} não pode ser igual a {ComparisonValue}")
-                .MaximumLength(256).WithMessage("O campo {PropertyName} não pode ser maior que {MaxLength} caracteres")
-                .EmailAddress().WithMessage("O campo {PropertyName} precisa ser um e-mail válido !");
+                .MaximumLength(256).WithMessage("O campo {PropertyName} não pode ser maior que {MaxLength} caracteres");
 
             RuleFor(c => c.Endereco)
                 .NotNull().WithMessage("O campo {PropertyName} precisa ser fornecido")

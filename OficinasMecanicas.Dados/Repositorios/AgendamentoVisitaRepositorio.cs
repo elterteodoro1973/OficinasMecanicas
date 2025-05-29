@@ -45,7 +45,11 @@ namespace OficinasMecanicas.Dados.Repositorios
 
         public async Task<AgendamentoVisita?> BuscarPorId(Guid id)
         => await _contexto.AgendamentoVisita.Where(c => c.Id == id).AsNoTracking().FirstOrDefaultAsync();
-        public async Task<IEnumerable<AgendamentoVisita>> BuscarTodos()=> await _contexto.AgendamentoVisita.AsNoTracking().ToListAsync();
+        
+        public async Task<IEnumerable<AgendamentoVisita>> BuscarTodos()
+        {
+            return await _contexto.AgendamentoVisita.Include(c=>c.IdUsuarioNavigation).Include(c => c.IdOficinaNavigation).ToListAsync();
+        } 
 
         public async Task<IList<AgendamentoVisita>?> BuscarPorDescricao(string descricao) => await _contexto.AgendamentoVisita.
             Where(c => c.Descricao.ToLower().Contains(descricao.ToLower())).ToListAsync();       
