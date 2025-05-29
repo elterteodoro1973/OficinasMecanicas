@@ -1,24 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
-using OficinasMecanicas.Dominio.DTO;
 using OficinasMecanicas.Dominio.Entidades;
+using OficinasMecanicas.Dominio.Entidades.Validacoes.Oficina;
+using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
-using OficinasMecanicas.Dominio.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using OficinasMecanicas.Dados.Repositorios;
 using OficinasMecanicas.Dominio.Notificacoes;
-using OficinasMecanicas.Dominio.Entidades.Validacoes.Usuarios;
-using OficinasMecanicas.Dominio.Entidades.Validacoes.Oficina;
 
 namespace OficinasMecanicas.Dados.Servicos
-{   
-
-    
+{  
     public class OficinaMecanicaServico : BaseServico<OficinaMecanica>, IOficinaMecanicaServico
     {
         private readonly IHttpContextAccessor _httpContext;

@@ -15,6 +15,10 @@
    "T4TemplatePath": null,
    "Tables": [
       {
+         "Name": "[dbo].[AgendamentoVisita]",
+         "ObjectType": 0
+      },
+      {
          "Name": "[dbo].[OficinaMecanica]",
          "ObjectType": 0
       },
@@ -23,7 +27,7 @@
          "ObjectType": 0
       },
       {
-         "Name": "[dbo].[ServicosPretstados]",
+         "Name": "[dbo].[ServicosPrestados]",
          "ObjectType": 0
       },
       {

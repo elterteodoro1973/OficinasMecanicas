@@ -13,6 +13,8 @@ public partial class OficinasMecanicasContext : DbContext
     {
     }
 
+    public virtual DbSet<AgendamentoVisita> AgendamentoVisita { get; set; }
+
     public virtual DbSet<OficinaMecanica> OficinaMecanica { get; set; }
 
     public virtual DbSet<ResetarSenha> ResetarSenha { get; set; }
@@ -23,6 +25,15 @@ public partial class OficinasMecanicasContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AgendamentoVisita>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_AgendamentosVisita");
+
+            entity.Property(e => e.Id).ValueGeneratedNever();
+
+            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.AgendamentoVisita).HasConstraintName("FK_AgendamentoVisita_Usuarios");
+        });
+
         modelBuilder.Entity<OficinaMecanica>(entity =>
         {
             entity.Property(e => e.Id).HasDefaultValueSql("(newid())");

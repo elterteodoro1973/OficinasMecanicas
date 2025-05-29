@@ -3,10 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace OficinasMecanicas.Web.ViewModels.Usuarios
 {
-    public class CadastrarEditarUsuarioViewModel
+    public class CadastrarEditarOficinaViewModel
     {
-
-
         public Guid? Id { get; set; }
 
         [Display(Name = "Nome")]
@@ -14,12 +12,14 @@ namespace OficinasMecanicas.Web.ViewModels.Usuarios
         [StringLength(256, ErrorMessage = "{0} possui tamanho máximo de 256 caracteres !")]
         public string Nome { get; set; } = null!;
 
-        [Display(Name = "Email")]
+        [Display(Name = "Endereco")]
         [Required(ErrorMessage = "{0} é obrigatório !")]
-        public string Email { get; set; } = null!;
+        [StringLength(256, ErrorMessage = "{0} possui tamanho máximo de 256 caracteres !")]
+        public string Endereco { get; set; } = null!;
 
-        public string? Senha { get; set; } = null!;
-
-        public string? ConfirmarSenha { get; set; } = null!;
+        [Display(Name = "Servicos")]
+        [Required(ErrorMessage = "{0} é obrigatório !")]
+        [StringLength(512, ErrorMessage = "{0} possui tamanho máximo de 256 caracteres !")]
+        public string Servicos { get; set; } = null!;
     }
 }

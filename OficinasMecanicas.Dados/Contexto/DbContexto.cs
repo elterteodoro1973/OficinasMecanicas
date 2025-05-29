@@ -1,26 +1,20 @@
-﻿using System;
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using OficinasMecanicas.Dados.Mapeamentos;
 using OficinasMecanicas.Dominio.Entidades;
-using OficinasMecanicas.Dominio.Interfaces.Servicos;
 
 namespace OficinasMecanicas.Dados.Contexto
 {
     public class DbContexto : DbContext
-    {
-        //private readonly ILogServico _logServico;
+    {        
         public DbContexto(DbContextOptions<DbContexto> options) : base(options)
-        {
-           // _logServico = logServico;
+        {           
         }
 
-        
-        public virtual DbSet<Usuarios> Usuarios { get; set; }
-        public virtual DbSet<ResetarSenha> ResetarSenha { get; set; }
-
+        public virtual DbSet<AgendamentoVisita> AgendamentoVisita { get; set; }
         public virtual DbSet<OficinaMecanica> OficinaMecanica { get; set; }
         public virtual DbSet<ServicosPrestados> ServicosPrestados { get; set; }
+        public virtual DbSet<Usuarios> Usuarios { get; set; }
+        public virtual DbSet<ResetarSenha> ResetarSenha { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -63,13 +57,10 @@ namespace OficinasMecanicas.Dados.Contexto
         {
             try
             {
-                ChangeTracker.DetectChanges();
-
-                
+                ChangeTracker.DetectChanges();                
             }
             catch (Exception)
             {
-
             }
         }
     }

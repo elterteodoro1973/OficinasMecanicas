@@ -24,7 +24,6 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
         {
            services.AddDbContext<Dados.Contexto.DbContexto>(o => o.UseSqlServer(conexao).EnableSensitiveDataLogging(), ServiceLifetime.Scoped);
         }
-
         public static void ConfigurarAutoMapper(this IServiceCollection services)
         {
            services.AddAutoMapper(typeof(MapeamentoEntidadeParaDTO), typeof(MapeamentoDTOParaEntidade));
@@ -33,30 +32,33 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
 
         public static void ConfigurarServicosERepositorios(this IServiceCollection services)
         {
-            ////Repositorios
-            services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();            
-            
+            ////Repositorios             
+            services.AddScoped<IAgendamentoVisitaRepositorio, AgendamentoVisitaRepositorio>();
+            services.AddScoped<IOficinaMecanicaRepositorio, OficinaMecanicaRepositorio>();
             services.AddScoped<IResetarSenhaRepositorio, ResetarSenhaRepositorio>();
-
-            ////Servicos de Dominio           
-            services.AddScoped<IUsuariosServico, UsuarioServico>();           
+            services.AddScoped<IServicosPrestadosRepositorio, ServicosPrestadosRepositorio>();
+            services.AddScoped<IUsuarioRepositorio, UsuarioRepositorio>();
             
-            services.AddScoped<IResetarSenhaServico, ResetarSenhaServico>();
-
+            ////Servicos de Dominio    
+            services.AddScoped<IAgendamentoVisitaServico,AgendamentoVisitaServico>();
+            services.AddScoped<IOficinaMecanicaServico,OficinaMecanicaServico>();            
+            services.AddScoped<IResetarSenhaServico,ResetarSenhaServico>();
+            services.AddScoped<IServicosPrestadosServico, ServicosPrestadosServico>();
+            services.AddScoped<IUsuariosServico,UsuarioServico>();
+            
             ////Servicos de Aplicacao
-            services.AddScoped<IUsuarioAppServico, UsuarioAppServico>();           
+            services.AddScoped<IAgendaVisitaAppServico,AgendaVisitaAppServico>();
+            services.AddScoped<IOficinaAppServico,OficinaAppServico>();
+            services.AddScoped<IUsuarioAppServico,UsuarioAppServico>();            
             
-
             //Outros Servicos
-            services.AddScoped<INotificador, Notificador>();
-            //services.AddScoped<ILogServico, LogServico>();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<IEmailServico,EmailServico>();
+            services.AddScoped<INotificador,Notificador>();            
+            services.AddSingleton<IHttpContextAccessor,HttpContextAccessor>();
+            services.AddScoped<IEmailServico,EmailServico>();            
         }
 
         public static void ConfigurarMensagensMVC(this IServiceCollection services)
-        {
-            
+        {            
             services.AddControllersWithViews().AddMvcOptions(o =>
             {
                 o.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((x, y) => "O valor preenchido é inválido para este campo.");
@@ -77,11 +79,8 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
                         Location = ResponseCacheLocation.None
                     });
                 o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-            });
-
-           
+            });           
         }
-
 
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
@@ -109,7 +108,6 @@ namespace OficinasMecanicas.Infraestrutura.CrossCutting.IoC
 
             return services;
         }
-
 
     }
 }

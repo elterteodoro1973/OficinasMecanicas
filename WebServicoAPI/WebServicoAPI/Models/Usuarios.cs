@@ -25,6 +25,9 @@ public partial class Usuarios
     [Unicode(false)]
     public string? Email { get; set; }
 
+    [InverseProperty("IdUsuarioNavigation")]
+    public virtual ICollection<AgendamentoVisita> AgendamentoVisita { get; set; } = new List<AgendamentoVisita>();
+
     [InverseProperty("Usuario")]
     public virtual ICollection<ResetarSenha> ResetarSenha { get; set; } = new List<ResetarSenha>();
 }

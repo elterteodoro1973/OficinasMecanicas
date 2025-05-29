@@ -216,7 +216,7 @@ namespace OficinasMecanicas.Web.Controllers
 
             var usuario = _mapper.Map<EditarUsuarioDTO>(model);
 
-            await _usuarioAppServico.Editar(usuario);
+            await _usuarioAppServico.Atualizar(usuario);
 
             if (!OperacaoValida())
                 return View(model);

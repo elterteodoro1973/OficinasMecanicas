@@ -10,9 +10,7 @@ namespace OficinasMecanicas.Dados.Mapeamentos
         public void Configure(EntityTypeBuilder<ResetarSenha> builder)
         {
             builder.ToTable("ResetarSenha");
-
-            builder.HasKey(c => c.Id);
-            builder.Property(e => e.Id).HasDefaultValueSql("(newid())");
+            builder.HasKey(c => c.Id);            
             builder.Property(e => e.Token);
             builder.Property(e => e.UsuarioId);
             builder.Property(e => e.DataSolicitacao).HasDefaultValueSql("(getdate())");
@@ -23,7 +21,6 @@ namespace OficinasMecanicas.Dados.Mapeamentos
             builder.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.ResetarSenha)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_ResetarSenha_Usuarios");
-
         }
     }
 }
