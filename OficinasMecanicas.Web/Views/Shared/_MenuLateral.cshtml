@@ -1,15 +1,6 @@
 ﻿<nav class="c-nav">
     <ul class="c-nav--list">
        
-        
-        
-        @* <li class="c-nav--list__item">
-            <a href="@Url.Action("Index","Relatorios")" class="c-nav--list__item-link c-form__info_menu">
-                <i class="icon-leaderboard"></i>
-                <span class="c-nav--list__item-link_label c-form__info--tooltip_menu">Relatórios</span>
-            </a>
-        </li> *@
-        
        
         <li class="c-nav--list__item">
             <a href="@Url.Action("Index","Usuarios")" class="c-nav--list__item-link c-form__info_menu">
@@ -17,15 +8,12 @@
                 <span class="c-nav--list__item-link_label c-form__info--tooltip_menu">Usuários</span>
             </a>
         </li>
-
-        @if (User.Identity != null && User.Identity.IsAuthenticated && (User.IsInRole("ADMINISTRADOR") || User.HasClaim(c => c.Type == "Perfis")))
-        {
-            <li class="c-nav--list__item" id="perfilMenu">
-                <a href="@Url.Action("Index","Perfis")" class="c-nav--list__item-link c-form__info_menu">
-                    <i class="icon-group"></i>
-                    <span class="c-nav--list__item-link_label c-form__info--tooltip_menu">Perfis</span>
-                </a>
-            </li>
-        }
+        <li class="c-nav--list__item">
+            <a href="@Url.Action("Index","OficinaMecanicas")" class="c-nav--list__item-link c-form__info_menu">
+                <i class="icon-person"></i>
+                <span class="c-nav--list__item-link_label c-form__info--tooltip_menu">Oficinas</span>
+            </a>
+        </li>
+        
     </ul>
 </nav>

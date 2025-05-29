@@ -3,6 +3,7 @@ using OficinasMecanicas.Aplicacao.DTO.Agenda;
 using OficinasMecanicas.Aplicacao.DTO.Oficinas;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Web.ViewModels.Agenda;
+using OficinasMecanicas.Web.ViewModels.Oficinas;
 using OficinasMecanicas.Web.ViewModels.Usuarios;
 
 namespace OficinasMecanicas.Web.Configuracoes.AutoMapper
@@ -22,7 +23,7 @@ namespace OficinasMecanicas.Web.Configuracoes.AutoMapper
                .ForMember(c => c.ConfirmarSenha, m => m.MapFrom(c => c.ConfirmarSenha));
 
             // Mapear Oficinas
-            CreateMap<OficinasTelaInicialDTO, OficinaViewModel>();
+            CreateMap<OficinasTelaInicialDTO, OficinasMecanicasViewModel>();
             CreateMap<CadastrarOficinaDTO, CadastrarEditarOficinaViewModel>();
             CreateMap<EditarOficinaDTO, CadastrarEditarOficinaViewModel>();
 

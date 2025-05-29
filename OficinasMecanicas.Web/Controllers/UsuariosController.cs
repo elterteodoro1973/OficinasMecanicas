@@ -1,21 +1,11 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
-using OficinasMecanicas.Aplicacao.Model;
-using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Web.ViewModels.Usuarios;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text;
-using Microsoft.AspNetCore.Http;
 
 
 namespace OficinasMecanicas.Web.Controllers
@@ -31,7 +21,6 @@ namespace OficinasMecanicas.Web.Controllers
         private readonly IMapper _mapper; 
         private readonly IWebHostEnvironment _env;
         
-
         public UsuariosController( ILogger<UsuariosController> logger, IUsuarioAppServico usuarioAppServico, IResetarSenhaServico resetarSenhaServico,
             IMapper mapper, INotificador notificador,         
             IWebHostEnvironment env, IConfiguration configuration) : base(notificador)
@@ -273,17 +262,6 @@ namespace OficinasMecanicas.Web.Controllers
             return View();
         }
         
-        public async Task<IActionResult> TrocarUsuarioLogado()
-        {
-            if (!BuscarUsuarioIdLogado().HasValue)
-                return BadRequest();
-
-            await _usuarioAppServico.TrocarUsuarioLogado(BuscarUsuarioIdLogado().Value);
-
-            if (OperacaoValida())
-                TempData["Sucesso"] = "selecionado com sucesso !";
-
-            return RedirectToAction("Index", "Home");
-        }
+        
     }
 }

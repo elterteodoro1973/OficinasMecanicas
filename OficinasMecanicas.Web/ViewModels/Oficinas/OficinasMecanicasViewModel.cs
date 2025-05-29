@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace OficinasMecanicas.Web.ViewModels.Usuarios
+namespace OficinasMecanicas.Web.ViewModels.Oficinas
 {
-    public class OficinaViewModel
+    public class OficinasMecanicasViewModel
     {
         public Guid? Id { get; set; }        
         public string Nome { get; set; } = null!;        

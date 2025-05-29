@@ -15,6 +15,7 @@ using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
@@ -48,22 +49,40 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         }
 
         public async Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro)
-        { 
-            var dtos = _mapper.Map<IList<UsuariosTelaInicialDTO>>(await _usuarioRepositorio.BuscarTodos());
+        {
+            var dtos =  await RequisitarDados("api/user");
+            var listaDados = dtos.dados;
 
             if (!string.IsNullOrEmpty(filtro) && !string.IsNullOrWhiteSpace(filtro))
             {
-                dtos = dtos.Where(c => c.Nome.ToUpper().Contains(filtro.ToUpper()) || c.Email.ToUpper().Contains(filtro.ToUpper()) ).ToList();
+                listaDados = listaDados.Where(c => c.Nome.ToUpper().Contains(filtro.ToUpper()) || c.Email.ToUpper().Contains(filtro.ToUpper())).ToList();
             }
 
-            return dtos;
+            return listaDados;
         }
 
-        public async Task<IList<UsuariosTelaInicialDTO>> BuscarTodos()
+        public async Task<IList<Usuarios>> BuscarTodos()
         {
-            var dtos = _mapper.Map<IList<UsuariosTelaInicialDTO>>(await _usuarioRepositorio.BuscarTodos());
-            return dtos;
+            return  await _usuarioRepositorio.BuscarTodos();
         }
+
+
+
+        private void ConfiguraClien(HttpClient client)
+        {
+            var enderecoBase = _configuration["baseURL:link"];
+            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
+
+            client.BaseAddress = new Uri(enderecoBase);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+            
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim.Value);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim.Value);
+        }
+
 
 
         public async Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint)
@@ -83,10 +102,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             {
                 using (var clienteAPI = new HttpClient())
                 {
-                    clienteAPI.BaseAddress = new Uri(enderecoBase);
-                    clienteAPI.DefaultRequestHeaders.Accept.Clear();
-                    clienteAPI.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    clienteAPI.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+                    ConfiguraClien(clienteAPI);
                     var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
                     conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
@@ -117,6 +133,65 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                 };
             }
         }
+
+        public async Task<Resposta<IList<UsuariosTelaInicialDTO>>> RequisitarDados(string endPoint)
+        {
+            var enderecoBase = _configuration["baseURL:link"];
+            if (string.IsNullOrEmpty(enderecoBase))
+            {
+                return new Resposta<IList<UsuariosTelaInicialDTO>>
+                {
+                    sucesso = false,
+                    mensagem = "Erro ao processar a resposta da API.",
+                    dados = default
+                };
+            }
+            
+            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
+            if (tokenClaim == null)
+            {
+                return new Resposta<IList<UsuariosTelaInicialDTO>>
+                {
+                    sucesso = false,
+                    mensagem = "Token não encontrado no contexto do usuário.",
+                    dados = default
+                };
+            }
+
+            try
+            {
+                using (var clienteAPI = new HttpClient())
+                {                    
+                    ConfiguraClien(clienteAPI);
+
+                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<UsuariosTelaInicialDTO>>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                    {
+                        return new Resposta<IList<UsuariosTelaInicialDTO>>
+                        {
+                            sucesso = false,
+                            mensagem = "Erro ao processar a resposta da API.",
+                            dados = default
+                        };
+                    }
+
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Resposta<IList<UsuariosTelaInicialDTO>>
+                {
+                    sucesso = false,
+                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
+                    dados = default
+                };
+            }
+        }
+
 
 
         public async Task RegistrarLogin(Resposta<UserToken> resposta)
@@ -159,7 +234,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             
         }
         
-
         public async Task Logout()
         {
             if (_httpContext.HttpContext.User.Identity != null && _httpContext.HttpContext.User.Identity.IsAuthenticated)

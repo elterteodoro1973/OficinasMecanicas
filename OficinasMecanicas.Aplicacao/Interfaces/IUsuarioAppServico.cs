@@ -24,7 +24,7 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
 
         Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro);
 
-        Task<IList<UsuariosTelaInicialDTO>> BuscarTodos();
+        Task<IList<Usuarios>> BuscarTodos();
         Task<LoginUsuarioDTO?> BuscarPorId(Guid usuarioId);
         Task<LoginUsuarioDTO?> BuscarPorEmail(string email);
         Task<LoginUsuarioDTO?> BuscarPorUsername(string username);

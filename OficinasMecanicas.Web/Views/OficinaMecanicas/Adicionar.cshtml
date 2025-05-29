@@ -1,0 +1,143 @@
+﻿@using OficinasMecanicas.Web.ViewModels.Usuarios;
+@model CadastrarEditarUsuarioViewModel
+@{
+    TempData["Title"] = "Cadastrar Usuário";
+}
+
+<h1 class="o-title"> CADASTRAR USUÁRIO </h1>
+
+
+
+<partial name="~/Views/Shared/_Avisos.cshtml" />
+<form asp-action="Adicionar" method="post" onsubmit="return validaPostar()" class="c-form">
+    <input type="hidden" asp-for="Id" value="@Model.Id" />
+    <div class="c-form__section">
+
+
+
+
+        <span class="c-form__section--label">Dados gerais</span>       
+        <div asp-validation-summary="All" id="ValidadorSumario" name="ValidadorSumario" class="text-danger center-content-start"></div>
+
+        
+
+        <div class="row">
+            <div class="c-form__group col-11">
+                @if (!String.IsNullOrEmpty(ViewBag.MensagemErro))
+                {
+                  <h3 class="c-login__form--title"><label style="color: read">@ViewBag.MensagemErro</label></h3>                    
+                }
+            </div>
+            <div class="c-form__group col-1">
+            </div>
+        </div>
+
+
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="Nome" class="c-form__label form-label control-label"></label>
+                <input asp-for="Nome" class="c-form__input form-control" required placeholder="Nome Completo">
+                <span asp-validation-for="Nome" class="form-text text-danger"></span>
+            </div>
+            <div class="c-form__group col-4">
+                
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="Email" class="c-form__label form-label control-label"></label>
+                <input asp-for="Email" class="c-form__input form-control" data-rule-email="true" required placeholder="Email">
+                <span asp-validation-for="Email" class="form-text text-danger"></span>
+            </div>
+            <div class="c-form__group col-4">               
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="Senha" class="c-form__label form-label control-label"></label>
+                <input asp-for="Senha" type="password" required class="c-form__input form-control" placeholder="Digite seu e-mail" maxlength="30">
+                <span  id="SenhaValida" name="SenhaValida" class="text-danger"></span>
+            </div>
+            <div class="c-form__group col-4">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="ConfirmarSenha" class="c-form__label form-label control-label"></label>
+                <input asp-for="ConfirmarSenha" type="password" required class="c-form__input form-control" placeholder="Digite seu e-mail" maxlength="30">
+                <span id="ConfirmarSenhaValida" name="ConfirmarSenhaValida" class="text-danger"></span>
+            </div>
+            <div class="c-form__group col-4">
+            </div>
+        </div>
+
+
+        
+
+
+    </div>    
+
+    <div class="c-form__btn-group">
+        <input type="submit" value="Cadastrar Usuário" class="o-btn o-btn-default">
+        <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
+    </div>
+</form>
+
+@section Scripts 
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+   
+    <script>
+
+        function paginaInicial() {
+            window.location.href = "@Url.Action("Index","Usuarios")";
+        }
+
+        const modal = new bootstrap.Modal('#modalConfirmacao');
+
+        function validaPostar() 
+        {
+          document.getElementById("ValidadorSumario").html = "";
+          document.getElementById("SenhaValida").textContent = "";
+          document.getElementById("ConfirmarSenhaValida").textContent = "";
+
+          var senha = document.getElementById("Senha");
+          var confirmarSenha = document.getElementById("ConfirmarSenha");
+
+          if (senha.value == "" || confirmarSenha.value == null)
+          {
+              //document.getElementById("ConfirmarSenhaValida").html = "Informe a senha.";
+              alert("Informe a senha.");
+              return false;
+          }
+
+          if (confirmarSenha.value == "" || confirmarSenha.value == null)
+          {
+              //document.getElementById("ConfirmarSenhaValida").html = "Informe a senha de validação.";
+              alert("Informe a senha de validação.");
+              return false;
+          }
+
+
+          if (senha.value !== confirmarSenha.value)
+          {
+              //document.getElementById("ConfirmarSenhaValida").html = "As senhas não conferem.";
+              alert("As senhas não conferem..");
+              return false;
+          }         
+          
+
+          return true;
+        }
+        
+        
+    </script>
+    }

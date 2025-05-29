@@ -11,18 +11,6 @@ namespace OficinasMecanicas.Web.Configuracoes.Claims
             var lista = new List<Tuple<string, string, string, Claim>>();
                        
 
-            #region Perfis
-
-            lista.Add(new Tuple<string, string, string, Claim>("Perfis", "Perfis", "Perfis - Visualizar", new Claim("Perfis", "Visualizar")));
-            lista.Add(new Tuple<string, string, string, Claim>("Perfis", "Perfis", "Perfis - Adicionar", new Claim("Perfis", "Adicionar")));
-            lista.Add(new Tuple<string, string, string, Claim>("Perfis", "Perfis", "Perfis - Editar", new Claim("Perfis", "Editar")));
-            lista.Add(new Tuple<string, string, string, Claim>("Perfis", "Perfis", "Perfis - Excluir", new Claim("Perfis", "Excluir")));
-            lista.Add(new Tuple<string, string, string, Claim>("Perfis", "Perfis", "Perfis - Historico", new Claim("Perfis", "Historico")));
-
-
-            #endregion
-
-
             #region Usuarios
 
             lista.Add(new Tuple<string, string, string, Claim>("Usuarios", "Usuarios", "Usuarios - Visualizar", new Claim("Usuarios", "Visualizar")));

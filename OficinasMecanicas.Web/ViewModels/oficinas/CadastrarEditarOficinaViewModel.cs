@@ -1,7 +1,7 @@
 ﻿using OficinasMecanicas.Web.Configuracoes.Validacoes;
 using System.ComponentModel.DataAnnotations;
 
-namespace OficinasMecanicas.Web.ViewModels.Usuarios
+namespace OficinasMecanicas.Web.ViewModels.Oficinas
 {
     public class CadastrarEditarOficinaViewModel
     {
