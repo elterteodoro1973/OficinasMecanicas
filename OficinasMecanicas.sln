@@ -29,6 +29,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "5 - WebServicoAPI", "5 - We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebServicoAPI", "WebServicoAPI\WebServicoAPI\WebServicoAPI.csproj", "{96C1F60F-B053-4BD8-A11F-D9487B8EE444}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4.3 -Database", "4.3 -Database", "{FA826F62-2EB3-42F6-ADC5-FA2EB94589AB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{0929DE74-395D-42CD-A43A-2ACD1FFD6425}"
+	ProjectSection(SolutionItems) = preProject
+		OficinasMecanicas_Crreate_Inserts.sql = OficinasMecanicas_Crreate_Inserts.sql
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bak", "Bak", "{D8434036-D63A-4EA5-9130-EAB5A25C6081}"
+	ProjectSection(SolutionItems) = preProject
+		OficinasMecanica.Bak = OficinasMecanica.Bak
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,6 +84,9 @@ Global
 		{C0420A3B-E29A-4D5B-B511-E9E1E4E6FD73} = {E8ACEAEC-E7D5-44A0-91FF-7C3DDF316C68}
 		{27581C58-379A-4CA3-889E-26A20E781F67} = {B46A2EE1-F054-4052-A316-1CB1737FD7DC}
 		{96C1F60F-B053-4BD8-A11F-D9487B8EE444} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FA826F62-2EB3-42F6-ADC5-FA2EB94589AB} = {55A674A2-D58D-4B4B-A175-F6911F04C624}
+		{0929DE74-395D-42CD-A43A-2ACD1FFD6425} = {FA826F62-2EB3-42F6-ADC5-FA2EB94589AB}
+		{D8434036-D63A-4EA5-9130-EAB5A25C6081} = {FA826F62-2EB3-42F6-ADC5-FA2EB94589AB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {68D8DE76-8F3F-47A7-993F-C48B34B4BB09}
