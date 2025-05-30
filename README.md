@@ -1,4 +1,7 @@
 # OficinasMecanicas
+Projeto Front and Back 
+    Front: Web MCV
+    Back:  Web API
 
 Estrutura banco:
   Backup: OficinasMecanica.Bak
