@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using OficinasMecanicas.Dominio.Interfaces.Servicos;
-using OficinasMecanicas.Dominio.Interfaces;
+using OficinasMecanicas.Aplicacao.DTO.Oficinas;
 using OficinasMecanicas.Aplicacao.Interfaces;
-using OficinasMecanicas.Web.ViewModels.Usuarios;
+using OficinasMecanicas.Dominio.Interfaces;
+using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Web.ViewModels.Oficinas;
+
+
 
 namespace OficinasMecanicas.Web.Controllers
 {
@@ -13,19 +15,27 @@ namespace OficinasMecanicas.Web.Controllers
         private readonly INotificador _notificador;
         private readonly ILogger<OficinaMecanicasController> _logger;
         private readonly IConfiguration _configuration;
-        private readonly IMapper _mapper;        
+        private readonly IMapper _mapper;
         private readonly IOficinaAppServico _oficinaAppServico;
+        private readonly IServicosPrestadosServico _servicosPrestadosServico;
 
-        public OficinaMecanicasController(ILogger<OficinaMecanicasController> logger,            
+        public OficinaMecanicasController(ILogger<OficinaMecanicasController> logger,
             IMapper mapper, INotificador notificador,
-            IWebHostEnvironment env, IConfiguration configuration, IOficinaAppServico oficinaAppServico)
+            IWebHostEnvironment env, IConfiguration configuration, IOficinaAppServico oficinaAppServico, IServicosPrestadosServico servicosPrestadosServico)
         {
             _logger = logger;
             _notificador = notificador;
             _mapper = mapper;
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
             _oficinaAppServico = oficinaAppServico;
+            _servicosPrestadosServico = servicosPrestadosServico;
         }
+
+        private async Task SetViewBagServicosPrestados()
+        {
+            var lista = _servicosPrestadosServico.BuscarTodos().Result;
+            ViewBag.listaServico = lista.ToList();
+        }   
 
         public async Task<IActionResult> Index(string? filtro, string? sort)
         {
@@ -41,93 +51,80 @@ namespace OficinasMecanicas.Web.Controllers
 
         public async Task<IActionResult> Adicionar()
         {
-            ViewBag.MensagemErro = String.Empty;
-            return View(new CadastrarEditarOficinaViewModel() { Id = Guid.NewGuid() });
-            //return View();
+            SetViewBagServicosPrestados();
+            ViewBag.MensagemErro = string.Empty;
+            return await Task.FromResult(View(new CadastrarEditarOficinaViewModel() { Id = Guid.NewGuid() }));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Adicionar([Bind("Nome, Email,Senha")] CadastrarEditarOficinaViewModel model)
+        public async Task<IActionResult> Adicionar(CadastrarEditarOficinaViewModel model)
         {
-            //ViewBag.MensagemErro = String.Empty;
+            SetViewBagServicosPrestados();
+            ViewBag.MensagemErro = String.Empty;
+            if (!ModelState.IsValid)
+                return View(model);
 
-            //if (!ModelState.IsValid)
-            //    return View(model);
-
-            //var usuario = _mapper.Map<CadastrarOficinaMecanicaDTO>(model);
-
-            //var respostaObjeto = await _usuarioAppServico.PostarRequisicao<CadastrarOficinaMecanicaDTO>(usuario, "api/auth/register");
-
-            //if (!respostaObjeto.sucesso)
-            //{
-            //    ViewBag.MensagemErro = respostaObjeto.mensagem;
-            //    return View(model);
-            //}
-
-            //if (!OperacaoValida())
-            //    return View(model);
-
-            //TempData["Sucesso"] = "Usuário cadastrado com sucesso !";
+            var oficinaDB = _mapper.Map<CadastrarOficinaDTO>(model);
+            var respostaObjeto = await _oficinaAppServico.PostWebApi<CadastrarOficinaDTO>(oficinaDB, "api/repairshops");
+            if (!respostaObjeto.sucesso)
+            {
+                ViewBag.MensagemErro = respostaObjeto.mensagem;
+                return View(model);
+            }            
+            
+            TempData["Sucesso"] = "Oficina adicionada com sucesso!";
             return RedirectToAction(nameof(Index));
         }
 
         public async Task<IActionResult> Editar(Guid id)
-        {
-            //var usuario = await _usuarioAppServico.BuscarOficinaMecanicaParaEditarPorId(id);
+        { 
+            var dtos = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops"); 
 
-            //if (usuario == null)
-            //    return BadRequest();
-
-            //var model = _mapper.Map<CadastrarEditarOficinaMecanicaViewModel>(usuario);
-            //return View(model);
-            return View();
+            if (dtos == null)
+                return NotFound();
+            SetViewBagServicosPrestados();
+            var model = _mapper.Map<CadastrarEditarOficinaViewModel>(dtos.dados);
+            return View(model);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Editar(Guid id, [Bind("Id, Nome,  Email")] CadastrarEditarOficinaViewModel model)
+        public async Task<IActionResult> Editar(Guid id, CadastrarEditarOficinaViewModel model)
         {
-            //if (id != model.Id)
-            //    ModelState.AddModelError("", "Usuário Inválido !");
+            SetViewBagServicosPrestados();
+            if (id != model.Id)
+                ModelState.AddModelError("", "Oficina inválida!");
 
-            //if (!ModelState.IsValid)
-            //    return View(model);
+            if (!ModelState.IsValid)
+                return View(model);
+            
+            var oficina = _mapper.Map<CadastrarOficinaDTO>(model);
+            //await _oficinaAppServico.Atualizar(id, oficina);
 
-            //var usuario = _mapper.Map<EditarOficinaMecanicaDTO>(model);
+            var respostaObjeto = await _oficinaAppServico.PutWebApi(id, oficina, $"api/repairshops");
+            if (respostaObjeto.sucesso) 
+              TempData["Sucesso"] = "Oficina atualizada com sucesso!";
 
-            //await _usuarioAppServico.Atualizar(usuario);
-
-            //if (!OperacaoValida())
-            //    return View(model);
-
-            TempData["Sucesso"] = "Usuário atualizado com sucesso !";
-            return RedirectToAction(nameof(Index));
+            //return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "OficinaMecanicas");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Excluir(Guid id)
         {
-            //var usuario = await _usuarioAppServico.BuscarOficinaMecanicaParaEditarPorId(id);
+            SetViewBagServicosPrestados();
 
-            //if (usuario == null)
-            //    return BadRequest("Usuário não encontrado !");
+            var oficina = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops");
+            if (oficina == null)
+                return NotFound("Oficina não encontrada!");
 
-            //await _usuarioAppServico.Excluir(id);
+            var respostaObjeto = await _oficinaAppServico.DeleteWebApi(id, $"api/repairshops");            
 
-            //if (!OperacaoValida())
-            //{
-            //    var lista = new List<string>();
-            //    foreach (var item in _notificador.ObterNotificacoes())
-            //    {
-            //        ModelState.AddModelError(string.Empty, item.Mensagem);
-            //        lista.Add(item.Mensagem);
-            //    }
-            //    return BadRequest(lista);
-            //}
-
-            return Ok("Usuário Excluido com sucesso !");
+            TempData["Sucesso"] = "Oficina excluída com sucesso!";
+            return RedirectToAction("Index", "OficinaMecanicas");
         }
     }
 }

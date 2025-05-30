@@ -6,9 +6,11 @@ using OficinasMecanicas.Aplicacao.Model;
 using OficinasMecanicas.Dominio.Entidades;
 using OficinasMecanicas.Dominio.Interfaces;
 using WebServicoAPI.JWT;
+using Microsoft.AspNetCore.Authorization;
 
 namespace WebServicoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class authController : ControllerBase

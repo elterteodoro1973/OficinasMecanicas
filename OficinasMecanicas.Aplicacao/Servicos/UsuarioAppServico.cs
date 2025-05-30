@@ -3,9 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Aplicacao.Model;
@@ -14,8 +12,6 @@ using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Dominio.Interfaces.Repositorios;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
-using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
@@ -50,7 +46,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
         public async Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro)
         {
-            var dtos =  await RequisitarDados("api/user");
+            var dtos =  await GetWebApi("api/user");
             var listaDados = dtos.dados;
 
             if (!string.IsNullOrEmpty(filtro) && !string.IsNullOrWhiteSpace(filtro))
@@ -65,27 +61,24 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         {
             return  await _usuarioRepositorio.BuscarTodos();
         }
-
-
-
         private void ConfiguraClien(HttpClient client)
         {
             var enderecoBase = _configuration["baseURL:link"];
-            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
+            var tokenClaim =  !_httpContext.HttpContext.User.Identity.IsAuthenticated ? "" :
+                               _httpContext.HttpContext.User?.Claims.First(c => c.Type == "TokenUsuario").Value.ToString();
 
             client.BaseAddress = new Uri(enderecoBase);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
-            
-            client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim.Value);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim.Value);
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));            
+            //client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim);
         }
 
 
 
-        public async Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint)
+        public async Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint)
         {
             var enderecoBase = _configuration["baseURL:link"];
             if (string.IsNullOrEmpty(enderecoBase))
@@ -134,30 +127,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
         }
 
-        public async Task<Resposta<IList<UsuariosTelaInicialDTO>>> RequisitarDados(string endPoint)
+        public async Task<Resposta<IList<UsuariosTelaInicialDTO>>> GetWebApi(string endPoint)
         {
-            var enderecoBase = _configuration["baseURL:link"];
-            if (string.IsNullOrEmpty(enderecoBase))
-            {
-                return new Resposta<IList<UsuariosTelaInicialDTO>>
-                {
-                    sucesso = false,
-                    mensagem = "Erro ao processar a resposta da API.",
-                    dados = default
-                };
-            }
-            
-            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
-            if (tokenClaim == null)
-            {
-                return new Resposta<IList<UsuariosTelaInicialDTO>>
-                {
-                    sucesso = false,
-                    mensagem = "Token não encontrado no contexto do usuário.",
-                    dados = default
-                };
-            }
-
             try
             {
                 using (var clienteAPI = new HttpClient())
@@ -177,7 +148,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                             dados = default
                         };
                     }
-
                     return respostaObjeto;
                 }
             }

@@ -12,6 +12,7 @@ using OficinasMecanicas.Dominio.Interfaces.Servicos;
 using OficinasMecanicas.Dominio.Notificacoes;
 using System.Net.Http.Headers;
 using System.Text;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OficinasMecanicas.Aplicacao.Servicos
 {
@@ -31,11 +32,10 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             _oficinaMecanicaServico = oficinaMecanicaServico;
             _configuration = configuration;
         }
-
         
         public async Task<IList<OficinasTelaInicialDTO>> ListarOficionasTelaInicial(string? filtro)
         {            
-            var lista = await RequisitarDados("api/repairshops");
+            var lista = await GetWebApi("api/repairshops");
             var dtos = lista.dados.ToList() ;
 
             if (!string.IsNullOrEmpty(filtro) && !string.IsNullOrWhiteSpace(filtro))
@@ -45,99 +45,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
 
             return dtos;
         }
-
-        public async Task<Resposta<IList<OficinasTelaInicialDTO>>> RequisitarDados(string endPoint)
-        {
-            try
-            {
-                using (var clienteAPI = new HttpClient())
-                {
-                    ConfiguraClien(clienteAPI);
-                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
-                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
-                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<OficinasTelaInicialDTO>>>(respostaconteudo);
-
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                    {
-                        return new Resposta<IList<OficinasTelaInicialDTO>>
-                        {
-                            sucesso = false,
-                            mensagem = "Erro ao processar a resposta da API.",
-                            dados = default
-                        };
-                    }
-
-                    return respostaObjeto;
-                }
-            }
-            catch (Exception ex)
-            {
-                return new Resposta<IList<OficinasTelaInicialDTO>>
-                {
-                    sucesso = false,
-                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
-                    dados = default
-                };
-            }
-        }
-
-
-
-
-        private void ConfiguraClien(HttpClient client)
-        {
-            var enderecoBase = _configuration["baseURL:link"];
-            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
-
-            client.BaseAddress = new Uri(enderecoBase);
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
-            client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim.Value);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim.Value);
-        }
-
-        public async Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint)
-        { 
-            try
-            {
-                using (var clienteAPI = new HttpClient())
-                {
-                    ConfiguraClien(clienteAPI);
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
-                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
-                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<UserToken>>(respostaconteudo);
-
-                    if (respostaObjeto == null)
-                    {
-                        return new Resposta<UserToken>
-                        {
-                            sucesso = false,
-                            mensagem = "Erro ao processar a resposta da API.",
-                            dados = default
-                        };
-                    }
-
-                    return respostaObjeto;
-                }
-            }
-            catch (Exception ex)
-            {
-                return new Resposta<UserToken>
-                {
-                    sucesso = false,
-                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
-                    dados = default
-                };
-            }
-        }
-
-       
-
 
         public async Task<EditarOficinaDTO> Adicionar(CadastrarOficinaDTO dto)
         {
@@ -180,6 +87,44 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return dtos;
         }
 
+        public async Task<Resposta<EditarOficinaDTO>> RequisitarDadosPorId(Guid id, string endPoint)
+        {
+            try
+            {
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+
+                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                    {
+                        return new Resposta<EditarOficinaDTO>
+                        {
+                            sucesso = false,
+                            mensagem = "Erro ao processar a resposta da API.",
+                            dados = default
+                        };
+                    }
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return new Resposta<EditarOficinaDTO>
+                {
+                    sucesso = false,
+                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
+                    dados = default
+                };
+            }
+        }
+
+
+
+
         public async Task<EditarOficinaDTO?> BuscarPorNome(string nome)
         {
             var dtos = _mapper.Map<EditarOficinaDTO>(await _oficinaMecanicaServico.BuscarPorNome(nome));
@@ -197,5 +142,161 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         {
             return await _oficinaMecanicaServico.NomePrincipalJaCadastrado(nome, id);
         }
+
+
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="client"></param>
+        /// 
+        private void ConfiguraClien(HttpClient client)
+        {
+            // Configura o cliente HTTP com a URL base e os cabeçalhos necessários
+            var enderecoBase = _configuration["baseURL:link"];
+            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
+
+            client.BaseAddress = new Uri(enderecoBase);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim.Value);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim.Value);
+        }
+        private Resposta<T> RetornoWebErro<T>(string mensagem)
+        {
+            // Retorna um objeto de resposta com erro
+            return new Resposta<T>
+            {
+                sucesso = false,
+                mensagem = mensagem,
+                dados = default
+            };
+        }
+
+        public async Task<Resposta<IList<OficinasTelaInicialDTO>>> GetWebApi(string endPoint)
+        {
+            try
+            {
+                //busca a lista de oficinas via API
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<OficinasTelaInicialDTO>>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<IList<OficinasTelaInicialDTO>>("Erro ao processar a resposta da API.");                    
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {                
+               return RetornoWebErro<IList<OficinasTelaInicialDTO>>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarOficinaDTO>> GetWebApiById(Guid id, string endPoint)
+        {
+            try
+            {
+                //busca o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.GetAsync($@"{endPoint}/{id}");
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)                                           
+                        return RetornoWebErro<EditarOficinaDTO>("Erro ao processar a resposta da API.");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);                
+            }
+        }
+
+        public async Task<Resposta<EditarOficinaDTO>> PostWebApi<T1>(T1 model, string endPoint)
+        {
+            
+            try
+            {  //Grava o objeto OficinaMecanica via API
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);                    
+
+                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
+
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)                                            
+                        return RetornoWebErro<EditarOficinaDTO>("Erro ao gravar os dados da oficina via API => ");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {               
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarOficinaDTO>> PutWebApi(Guid id,CadastrarOficinaDTO model,string endPoint)
+        {
+            try
+            {
+                //Atualiza o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+
+                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", conteudoJSON);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<EditarOficinaDTO>("Erro ao atualizar o dados da oficina via API => ");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarOficinaDTO>> DeleteWebApi(Guid id, string endPoint)
+        {
+            try
+            {
+                //Deleta o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.DeleteAsync($@"{endPoint}/{id}");
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)                    
+                        return RetornoWebErro<EditarOficinaDTO>("Erro ao deletar a oficina via API=>");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        
     }
 }

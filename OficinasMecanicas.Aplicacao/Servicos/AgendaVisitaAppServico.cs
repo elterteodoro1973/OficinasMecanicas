@@ -14,6 +14,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections;
+using Newtonsoft.Json;
+using OficinasMecanicas.Aplicacao.Model;
+using System.Net.Http.Headers;
+using System.Net.Http;
 
 namespace OficinasMecanicas.Aplicacao.Servicos
 {
@@ -35,11 +39,21 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         }
         public async Task<IList<AgendamentosVisitasTelaInicialDTO>> ListarAgendamentoVisitasTelaInicial(string? filtro)
         {
-            var dtos = _mapper.Map<IList<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarTodos());
+            var lista = await GetWebApi("api/bookings");
+            var dtos = lista.dados.ToList();
+
             if (!string.IsNullOrEmpty(filtro) && !string.IsNullOrWhiteSpace(filtro))
             {
                 dtos = dtos.Where(c => c.Descricao.ToUpper().Contains(filtro.ToUpper())).ToList();
             }
+
+            var usuario = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "UsuarioId");
+
+            if (usuario != null && !string.IsNullOrEmpty(usuario.Value))
+            {
+                dtos = dtos.Where(c => c.IdUsuario.ToString() == usuario.Value).ToList();
+            }
+
             return dtos;
         }
         public async Task<EditarAgendamentoVisitaDTO> Adicionar(CadastrarAgendamentoVisitaDTO dto)
@@ -98,5 +112,159 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             var dtos = _mapper.Map<IEnumerable<AgendamentosVisitasTelaInicialDTO>>(await _agendamentoVisitaServico.BuscarPorDescricao(descricao));
             return dtos;
         }
+
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="client"></param>
+        /// 
+        private void ConfiguraClien(HttpClient client)
+        {
+            // Configura o cliente HTTP com a URL base e os cabeçalhos necessários
+            var enderecoBase = _configuration["baseURL:link"];
+            var tokenClaim = _httpContext.HttpContext.User.Claims.First(c => c.Type == "TokenUsuario");
+
+            client.BaseAddress = new Uri(enderecoBase);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim.Value);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim.Value);
+        }
+        private Resposta<T> RetornoWebErro<T>(string mensagem)
+        {
+            // Retorna um objeto de resposta com erro
+            return new Resposta<T>
+            {
+                sucesso = false,
+                mensagem = mensagem,
+                dados = default
+            };
+        }
+
+        public async Task<Resposta<IList<AgendamentosVisitasTelaInicialDTO>>> GetWebApi(string endPoint)
+        {
+            try
+            {
+                //busca a lista de oficinas via API
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<AgendamentosVisitasTelaInicialDTO>>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>("Erro ao processar a resposta da API.");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarAgendamentoVisitaDTO>> GetWebApiById(Guid id, string endPoint)
+        {
+            try
+            {
+                //busca o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.GetAsync($@"{endPoint}/{id}");
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao processar a resposta da API.");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarAgendamentoVisitaDTO>> PostWebApi<T1>(T1 model, string endPoint)
+        {
+
+            try
+            {  //Grava o objeto OficinaMecanica via API
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+
+                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
+
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao gravar os dados da oficina via API => ");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarAgendamentoVisitaDTO>> PutWebApi(Guid id, CadastrarAgendamentoVisitaDTO model, string endPoint)
+        {
+            try
+            {
+                //Atualiza o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+
+                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", conteudoJSON);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao atualizar o dados da oficina via API => ");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<EditarAgendamentoVisitaDTO>> DeleteWebApi(Guid id, string endPoint)
+        {
+            try
+            {
+                //Deleta o objeto OficinaMecanica via API pelo id
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.DeleteAsync($@"{endPoint}/{id}");
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao deletar a oficina via API=>");
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
     }
 }

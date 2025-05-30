@@ -23,7 +23,7 @@ namespace OficinasMecanicas.Web.ViewModels.Agenda
         public string NomeOficina { get; set; } = null!;
 
         [Display(Name = "Data/Hora")]
-        public string DataHora { get; set; } = null!;
+        public DateTime DataHora { get; set; }
 
         [Display(Name = "Objetivo da visita")]
         public string Descricao { get; set; } = null!;

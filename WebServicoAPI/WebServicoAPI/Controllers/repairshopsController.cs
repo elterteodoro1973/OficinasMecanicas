@@ -1,15 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using OficinasMecanicas.Aplicacao.DTO.Oficinas;
-using OficinasMecanicas.Aplicacao.DTO.Usuarios;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Aplicacao.Model;
 using OficinasMecanicas.Dominio.Interfaces;
-using WebServicoAPI.JWT;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace WebServicoAPI.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class repairshopsController : ControllerBase

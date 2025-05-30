@@ -16,7 +16,7 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         
         Task Logout();
         Task RegistrarLogin(Resposta<UserToken> resposta);
-        Task<Resposta<UserToken>> PostarRequisicao<T1>(T1 model, string endPoint);
+        
         Task <EditarUsuarioDTO?> Adicionar(string caminho, CadastrarUsuarioDTO dto);
         Task Atualizar(EditarUsuarioDTO dto);
 
@@ -39,5 +39,7 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         Task<bool> SenhaValidaLogin(string email, string senha);
         Task<bool> NomePrincipalJaCadastrado(string nome, Guid? id);
         Task<bool> EmailPrincipalJaCadastrado(string email, Guid? id);
+        Task<Resposta<IList<UsuariosTelaInicialDTO>>> GetWebApi(string endPoint);
+        Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint);
     }
 }

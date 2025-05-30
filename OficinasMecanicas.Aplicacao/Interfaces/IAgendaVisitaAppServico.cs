@@ -1,5 +1,6 @@
 ﻿using OficinasMecanicas.Aplicacao.DTO.Agenda;
 using OficinasMecanicas.Aplicacao.DTO.Oficinas;
+using OficinasMecanicas.Aplicacao.Model;
 using OficinasMecanicas.Dominio.Entidades;
 using System;
 using System.Collections.Generic;
@@ -20,5 +21,11 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         Task<EditarAgendamentoVisitaDTO?> BuscarPorId(Guid id);
         Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDatas(DateTime dtInicio, DateTime dtfinal);
         Task<IEnumerable<AgendamentosVisitasTelaInicialDTO>?> BuscarPorDescricao(string descricao);
+
+        Task<Resposta<IList<AgendamentosVisitasTelaInicialDTO>>> GetWebApi(string endPoint);
+        Task<Resposta<EditarAgendamentoVisitaDTO>> PostWebApi<T1>(T1 model, string endPoint);
+        Task<Resposta<EditarAgendamentoVisitaDTO>> GetWebApiById(Guid id, string endPoint);
+        Task<Resposta<EditarAgendamentoVisitaDTO>> PutWebApi(Guid id, CadastrarAgendamentoVisitaDTO model, string endPoint);
+        Task<Resposta<EditarAgendamentoVisitaDTO>> DeleteWebApi(Guid id, string endPoint);
     }
 }

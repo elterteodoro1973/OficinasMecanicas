@@ -72,12 +72,8 @@ namespace OficinasMecanicas.Web.Controllers
 
             if (!OperacaoValida())
                 return View(model);
-
-            var linkBase = "https://localhost:7174/";
-            var token = string.Empty;
-
             
-            var respostaObjeto = await _usuarioAppServico.PostarRequisicao<LoginViewModel>(model,"api/auth/login");
+            var respostaObjeto = await _usuarioAppServico.PostWebApi<LoginViewModel>(model,"api/auth/login");
 
             if (!respostaObjeto.sucesso)
             {
@@ -154,24 +150,16 @@ namespace OficinasMecanicas.Web.Controllers
         public async Task<IActionResult> Adicionar([Bind("Nome, Email,Senha")] CadastrarEditarUsuarioViewModel model)
         {
             ViewBag.MensagemErro = String.Empty;
-
-
             if (!ModelState.IsValid)
                 return View(model);
 
             var usuario = _mapper.Map<CadastrarUsuarioDTO>(model);
-
-            //await _usuarioAppServico.Adicionar(_env.WebRootPath, usuario);
-
-            var respostaObjeto = await _usuarioAppServico.PostarRequisicao<CadastrarUsuarioDTO>(usuario, "api/auth/register");
-
+            var respostaObjeto = await _usuarioAppServico.PostWebApi<CadastrarUsuarioDTO>(usuario, "api/auth/register");
             if (!respostaObjeto.sucesso)
             {
                 ViewBag.MensagemErro = respostaObjeto.mensagem;
                 return View(model);
             }
-            
-            //await _usuarioAppServico.RegistrarLogin(respostaObjeto);
 
             if (!OperacaoValida())
                 return View(model);

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OficinasMecanicas.Aplicacao.DTO.Agenda;
 using OficinasMecanicas.Aplicacao.Interfaces;
 using OficinasMecanicas.Aplicacao.Model;
@@ -9,6 +10,7 @@ using OficinasMecanicas.Dominio.Interfaces;
 
 namespace WebServicoAPI.Controllers
 {
+    [Authorize] 
     [Route("api/[controller]")]
     [ApiController]
     public class bookingsController : ControllerBase

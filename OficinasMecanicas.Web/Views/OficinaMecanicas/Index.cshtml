@@ -1,14 +1,14 @@
 ﻿@using OficinasMecanicas.Web.ViewModels.Usuarios;
 
 <h1 class="o-title">
-    Usuários
+    Oficina
 </h1>
 <partial name="~/Views/Shared/_Avisos.cshtml" />
 <div id="avisos"></div>
 <div class="c-tabledata">
     <div class="c-tabledata__controllers">
         <input type="search" id="pesquisaGrid" class="c-tabledata__controllers--search c-form__input c-form__input--search" placeholder="Pesquisar por nome, email ou cpf" />
-        <a href="@Url.Action("Adicionar","Usuarios")" class="o-btn o-btn-default">Adicionar Usuário</a>
+        <a href="@Url.Action("Adicionar","OficinaMecanicas")" class="o-btn o-btn-default">Adicionar oficina</a>
     </div>
 
     @Html.AjaxGrid(Url.Action("Index"))
@@ -19,21 +19,15 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
-
-
-    <script id="Historico-componente.js" src="~/js/modalhistorico-componente.js"
-            data-urlPost="@Url.Action("Historico","Usuarios")"></script>
+    
 
     <script>
-        const urlExclusao = "@Html.Raw(Url.Action("Excluir", "Usuarios"))";
+        const urlExclusao = "@Html.Raw(Url.Action("Excluir", "OficinaMecanicas"))";
         function excluir(id) {
 
             const modal = new bootstrap.Modal('#modalConfirmacao');
 
-            $(".modal-body").html("<p class='lh-base'>Deseja excluir permanentemente o usuário ?</p>")
+            $(".modal-body").html("<p class='lh-base'>Deseja excluir permanentemente a oficina ?</p>")
 
             modal.show();
 
@@ -47,10 +41,9 @@
                         __RequestVerificationToken: `${pegarToken()}`,
                     },
                     async: false
-                }).done((resultado) => {
+                }).done((resultado) => 
+                {
                     const grid = new MvcGrid(document.querySelector(".mvc-grid"));
-
-
 
                     grid.reload();
                     let html = `<div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -59,8 +52,10 @@
                                 </div>`
                     $("#avisos").html(html);
                     modal.hide();
-                }).fail((jqXHR, textStatus, errorThrown) => {
-                    if (jqXHR != undefined && jqXHR.responseJSON != undefined && jqXHR.responseJSON != null){
+                }).fail((jqXHR, textStatus, errorThrown) => 
+                {
+                    if (jqXHR != undefined && jqXHR.responseJSON != undefined && jqXHR.responseJSON != null)
+                    {
                         $(jqXHR.responseJSON).each((i,e)=>{
                             let html = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
                                                 ${e}
@@ -69,11 +64,12 @@
                             $("#avisos").prepend(html);
                         })
                     }
-                    else if (jqXHR != undefined && jqXHR.responseText != undefined && jqXHR.responseText != null){
+                    else if (jqXHR != undefined && jqXHR.responseText != undefined && jqXHR.responseText != null)
+                    {
                         let html = `<div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                                        ${jqXHR.responseText}
-                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                                </div>`;
+                                           ${jqXHR.responseText}
+                                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                     </div>`;
                         $("#avisos").html(html);
                     }
                     modal.hide();

@@ -10,7 +10,7 @@ using WebServicoAPI.JWT;
 
 namespace WebServicoAPI.Controllers
 {
-    [Authorize] // Moved [Authorize] to the class level where it is valid.  
+    [Authorize] 
     [Route("api/[controller]")]
     [ApiController]
     public class userController : ControllerBase

@@ -8,13 +8,14 @@ Html
         .Build(columns =>
         {
             columns.Add(model => model.Nome).Titled("Nome").Filterable(true);
-            //columns.Add(model => model.Email).Titled("E-mail");
+            columns.Add(model => model.Endereco).Titled("Endereço");
+            
 
             columns.Add(model => $"<div class='dropdown dropdown-actions'>"
                                 + $"<button class='btn btn-secondary dropdown-toggle btn-action' onclick='ativarbtn(this)' type='button' id='dropdownMenuButton' data-bs-toggle='dropdown' aria-expanded='false'><span>Ações</span></button>"
                                 + $"<ul class='dropdown-menu' aria-labelledby='dropdownMenuButton'>"
                                 + "<li>"
-                                    + $"<a href='{Url.Action("Editar", "Usuarios", new { id = model.Id })}'><i class='icon-mode-edit' style='padding-right:4rem'></i> Editar</a>"
+                                    + $"<a href='{Url.Action("Editar", "OficinaMecanicas", new { id = model.Id })}'><i class='icon-mode-edit' style='padding-right:4rem'></i> Editar</a>"
                                 + "</li>"
                                 + "<li>"
                                     + $"<a href='#' onclick='excluir(`{model.Id}`)'><i class='icon-delete' style='padding-right:4rem'></i> Excluir</a>"
@@ -41,8 +42,6 @@ Html
         })
         )
 
-<link rel="stylesheet" href="~/css/modal-historico-componente.css">
-<link rel="stylesheet" href="~/css/data-table-historico.css">
-<link rel="stylesheet" href="//use.fontawesome.com/releases/v5.0.7/css/all.css">
+
 
 <script></script>

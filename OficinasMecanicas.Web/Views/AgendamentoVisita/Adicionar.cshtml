@@ -1,0 +1,119 @@
+﻿@using OficinasMecanicas.Aplicacao.DTO.Oficinas
+@using OficinasMecanicas.Aplicacao.DTO.Usuarios
+@using OficinasMecanicas.Dominio.Entidades
+@using OficinasMecanicas.Web.ViewModels.Agenda
+@using OficinasMecanicas.Web.ViewModels.Oficinas;
+@model CadastrarEditarAgendamentoVisitaViewModel
+
+@{
+    TempData["Title"] = "Cadastrar agendamento";
+    List<OficinasTelaInicialDTO> listaOficinas = ViewBag.listaOficinas as List<OficinasTelaInicialDTO>;
+    
+}
+
+<h1 class="o-title"> Adicionar agendamento </h1>
+
+
+<partial name="~/Views/Shared/_Avisos.cshtml" />
+<form asp-action="Adicionar" method="post" onsubmit="return validaPostar()" class="c-form">
+    <input type="hidden" asp-for="Id" value="@Model.Id" />
+    <div class="c-form__section">
+
+        <span class="c-form__section--label">Dados gerais</span>       
+        <div asp-validation-summary="All" id="ValidadorSumario" name="ValidadorSumario" class="text-danger center-content-start"></div>
+
+        <div class="row">
+            <div class="c-form__group col-11">
+                @if (!String.IsNullOrEmpty(ViewBag.MensagemErro))
+                {
+                    <h3 class="c-login__form--title"><label style="color: read">@ViewBag.MensagemErro</label></h3>                    
+                }
+            </div>
+            <div class="c-form__group col-1">
+            </div>
+        </div>
+
+        <input asp-for="IdUsuario" type="hidden" class="c-form__input form-control" required placeholder="">
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="IdOficina" class="c-form__label form-label control-label">Oficina</label>
+                <select asp-for="IdOficina" name="IdOficina" id="IdOficina" class="c-form__input form-control">
+                    
+                    <option value="" selected></option>
+                    
+                    @foreach (OficinasTelaInicialDTO item in listaOficinas)
+                    {
+                        if (item.Id == Model.IdOficina)
+                        {
+                            <option value="@item.Id" selected>@item.Nome</option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id">@item.Nome</option>
+                        }
+                    }
+                 </select>
+                <span asp-validation-for="IdOficina" class="form-text text-danger"></span>
+            </div>
+            <div class="c-form__group col-4">               
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="c-form__group col-8">
+             <label asp-for="DataHora" class="c-form__label form-label control-label"></label>
+            </div>
+        </div>
+
+        <div class="row">            
+            <div class="c-form__group col-4">
+                <input asp-for="DataHora" type="datetime-local" name="DataHora" class="c-form__input form-control" />
+            </div>            
+            <span asp-validation-for="DataHora" class="form-text text-danger"></span>
+        </div>
+
+        <div class="row">
+            <div class="c-form__group col-8">
+                <label asp-for="Descricao" class="c-form__label form-label control-label"></label>
+                <input asp-for="Descricao" class="c-form__input form-control"  required placeholder="">
+                <span asp-validation-for="Descricao" class="form-text text-danger"></span>
+            </div>
+
+            <div class="c-form__group col-4">
+            </div>
+        </div>
+
+    </div>    
+
+    <div class="c-form__btn-group">
+        <input type="submit" value="Cadastrar Usuário" class="o-btn o-btn-default">
+        <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
+    </div>
+</form>
+
+@section Scripts 
+{
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    
+   
+    <script>
+         $(document).ready(function() {         
+         });
+         const modal = new bootstrap.Modal('#modalConfirmacao');
+
+        
+
+        function paginaInicial() {
+            window.location.href = "@Url.Action("Index", "OficinaMecanicas")";
+        }
+
+        function validaPostar() 
+        {
+          return true;
+        }        
+        
+    </script>
+    }
