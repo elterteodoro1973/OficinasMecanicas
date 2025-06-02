@@ -15,7 +15,9 @@ Configurações
      Endereço base da Web API : "baseURL" =>  "link"
      
 Setup:
-  Realize a restauraçaõ da base de OficinasMecanica.Bak no SQL Server.
+  Realize a restauraçaõ da base de OficinasMecanica.Bak no SQL Server, ou execução do Scripts 
+   e nos projetos Web e API modifique no appsettings.json as chaves ConnectionStrings=> "DefaultConnection" 
+   com os dados do servidor de Banco de dados.
   Execução do Web API:
     Realize o Deploy no IIS,e modifiquei o appsettings.json no projeto Front WEB,
 	na Chave "baseURL" => "link" como endereço de publicação do Web API ou 
