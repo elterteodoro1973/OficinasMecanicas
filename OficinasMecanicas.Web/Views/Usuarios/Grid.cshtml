@@ -8,7 +8,7 @@ Html
         .Build(columns =>
         {
             columns.Add(model => model.Nome).Titled("Nome").Filterable(true);
-            columns.Add(model => model.Email).Titled("E-mail"); 
+            columns.Add(model => model.Email).Titled("E-mail").Filterable(true);
         })
         .AppendCss("c-tabledata__table")
         .Using(GridFilterMode.Excel)

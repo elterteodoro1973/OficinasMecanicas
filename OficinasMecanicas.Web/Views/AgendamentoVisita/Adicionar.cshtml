@@ -6,7 +6,7 @@
 @model CadastrarEditarAgendamentoVisitaViewModel
 
 @{
-    TempData["Title"] = "Cadastrar agendamento";
+    TempData["Title"] = "Adicionar agendamento";
     List<OficinasTelaInicialDTO> listaOficinas = ViewBag.listaOficinas as List<OficinasTelaInicialDTO>;
     
 }
@@ -38,7 +38,7 @@
         <div class="row">
             <div class="c-form__group col-8">
                 <label asp-for="IdOficina" class="c-form__label form-label control-label">Oficina</label>
-                <select asp-for="IdOficina" name="IdOficina" id="IdOficina" class="c-form__input form-control">
+                <select asp-for="IdOficina" name="IdOficina" required id="IdOficina" class="c-form__input form-control">
                     
                     <option value="" selected></option>
                     
@@ -68,7 +68,7 @@
 
         <div class="row">            
             <div class="c-form__group col-4">
-                <input asp-for="DataHora" type="datetime-local" name="DataHora" class="c-form__input form-control" />
+                <input asp-for="DataHora" required type="datetime-local" name="DataHora" class="c-form__input form-control" />
             </div>            
             <span asp-validation-for="DataHora" class="form-text text-danger"></span>
         </div>
@@ -87,7 +87,7 @@
     </div>    
 
     <div class="c-form__btn-group">
-        <input type="submit" value="Cadastrar Usuário" class="o-btn o-btn-default">
+        <input type="submit" value="Cadastrar" class="o-btn o-btn-default">
         <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
     </div>
 </form>
@@ -107,13 +107,10 @@
         
 
         function paginaInicial() {
-            window.location.href = "@Url.Action("Index", "OficinaMecanicas")";
+            window.location.href = "@Url.Action("Index", "AgendamentoVisita")";
         }
 
-        function validaPostar() 
-        {
-          return true;
-        }        
+              
         
     </script>
     }

@@ -15,81 +15,93 @@
 
 
 <partial name="~/Views/Shared/_Avisos.cshtml" />
-<form asp-action="Editar" method="post" onsubmit="return validaPostar()" class="c-form">
+<form asp-action="Editar" method="post" class="c-form">
     <input type="hidden" asp-for="Id" value="@Model.Id" />
-    <div class="c-form__section">
-
-        <span class="c-form__section--label">Dados gerais</span>
-        <div asp-validation-summary="All" id="ValidadorSumario" name="ValidadorSumario" class="text-danger center-content-start"></div>
-
-        <div class="row">
-            <div class="c-form__group col-11">
-                @if (!String.IsNullOrEmpty(ViewBag.MensagemErro))
-                {
+    
+    @if (!String.IsNullOrEmpty(ViewBag.MensagemErro))
+    {
+        <div class="c-form__section">
+            <div class="row">
+                <div class="c-form__group col-11">
                     <h3 class="c-login__form--title"><label style="color: read">@ViewBag.MensagemErro</label></h3>
-                }
-            </div>
-            <div class="c-form__group col-1">
-            </div>
+                </div>
+                <div class="c-form__group col-1">
+                </div>
+            </div> 
         </div>
+        <div class="c-form__btn-group">            
+            <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
+        </div>
+    }
 
-        <input asp-for="IdUsuario" type="hidden" class="c-form__input form-control" required placeholder="">
 
-        <div class="row">
-            <div class="c-form__group col-8">
-                <label asp-for="IdOficina" class="c-form__label form-label control-label">Oficina</label>
-                <select asp-for="IdOficina" name="IdOficina" id="IdOficina" class="c-form__input form-control">
+    @if (String.IsNullOrEmpty(ViewBag.MensagemErro))
+    {
+        <div class="c-form__section">
 
-                    <option value="" selected></option>
+            <span class="c-form__section--label">Dados gerais</span>
+            <div asp-validation-summary="All" id="ValidadorSumario" name="ValidadorSumario" class="text-danger center-content-start"></div>
 
-                    @foreach (OficinasTelaInicialDTO item in listaOficinas)
-                    {
-                        if (item.Id == Model.IdOficina)
+        
+
+            <input asp-for="IdUsuario" type="hidden" class="c-form__input form-control" required placeholder="">
+
+            <div class="row">
+                <div class="c-form__group col-8">
+                    <label asp-for="IdOficina" class="c-form__label form-label control-label">Oficina</label>
+                    <select asp-for="IdOficina" name="IdOficina" id="IdOficina" class="c-form__input form-control">
+
+                        <option value="" selected></option>
+
+                        @foreach (OficinasTelaInicialDTO item in listaOficinas)
                         {
-                            <option value="@item.Id" selected>@item.Nome</option>
+                            if (item.Id == Model.IdOficina)
+                            {
+                                <option value="@item.Id" selected>@item.Nome</option>
+                            }
+                            else
+                            {
+                                <option value="@item.Id">@item.Nome</option>
+                            }
                         }
-                        else
-                        {
-                            <option value="@item.Id">@item.Nome</option>
-                        }
-                    }
-                </select>
-                <span asp-validation-for="IdOficina" class="form-text text-danger"></span>
+                    </select>
+                    <span asp-validation-for="IdOficina" class="form-text text-danger"></span>
+                </div>
+                <div class="c-form__group col-4">
+                </div>
             </div>
-            <div class="c-form__group col-4">
+
+            <div class="row">
+                <div class="c-form__group col-8">
+                    <label asp-for="DataHora" class="c-form__label form-label control-label"></label>
+                </div>
             </div>
+
+            <div class="row">
+                <div class="c-form__group col-4">
+                    <input asp-for="DataHora" type="datetime-local" name="DataHora" class="c-form__input form-control" />
+                </div>
+                <span asp-validation-for="DataHora" class="form-text text-danger"></span>
+            </div>
+
+            <div class="row">
+                <div class="c-form__group col-8">
+                    <label asp-for="Descricao" class="c-form__label form-label control-label"></label>
+                    <input asp-for="Descricao" class="c-form__input form-control" required placeholder="">
+                    <span asp-validation-for="Descricao" class="form-text text-danger"></span>
+                </div>
+
+                <div class="c-form__group col-4">
+                </div>
+            </div>
+
         </div>
 
-        <div class="row">
-            <div class="c-form__group col-8">
-                <label asp-for="DataHora" class="c-form__label form-label control-label"></label>
-            </div>
+        <div class="c-form__btn-group">
+            <input type="submit" value="Cadastrar" class="o-btn o-btn-default">
+            <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
         </div>
-
-        <div class="row">
-            <div class="c-form__group col-4">
-                <input asp-for="DataHora" type="datetime-local" name="DataHora" class="c-form__input form-control" />
-            </div>
-            <span asp-validation-for="DataHora" class="form-text text-danger"></span>
-        </div>
-
-        <div class="row">
-            <div class="c-form__group col-8">
-                <label asp-for="Descricao" class="c-form__label form-label control-label"></label>
-                <input asp-for="Descricao" class="c-form__input form-control" required placeholder="">
-                <span asp-validation-for="Descricao" class="form-text text-danger"></span>
-            </div>
-
-            <div class="c-form__group col-4">
-            </div>
-        </div>
-
-    </div>
-
-    <div class="c-form__btn-group">
-        <input type="submit" value="Cadastrar Usuário" class="o-btn o-btn-default">
-        <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
-    </div>
+    }
 </form>
 
 @section Scripts
@@ -106,13 +118,10 @@
 
 
         function paginaInicial() {
-            window.location.href = "@Url.Action("Index", "OficinaMecanicas")";
+            window.location.href = "@Url.Action("Index", "AgendamentoVisita")";
         }
 
-        function validaPostar()
-        {
-          return true;
-        }
+        
 
     </script>
     }

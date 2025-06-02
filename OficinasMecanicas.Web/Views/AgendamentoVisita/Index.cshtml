@@ -1,7 +1,7 @@
 ﻿@using OficinasMecanicas.Web.ViewModels.Agenda;
 
 <h1 class="o-title">
-    Agendamento
+    Agendamentos
 </h1>
 <partial name="~/Views/Shared/_Avisos.cshtml" />
 <div id="avisos"></div>
@@ -10,16 +10,16 @@
         <input type="search" id="pesquisaGrid" class="c-tabledata__controllers--search c-form__input c-form__input--search" placeholder="Pesquisar por nome, email ou cpf" />
         <a href="@Url.Action("Adicionar","AgendamentoVisita")" class="o-btn o-btn-default">Adicionar agendamento</a>
     </div>
+    <div id="Grid">
+        @Html.AjaxGrid(Url.Action("Index"))
+    </div>
 
-    @Html.AjaxGrid(Url.Action("Index"))
 </div>
 
 @section Scripts {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
-
-
 
     <script>
         const urlExclusao = "@Html.Raw(Url.Action("Excluir", "AgendamentoVisita"))";
@@ -46,12 +46,14 @@
                     const grid = new MvcGrid(document.querySelector(".mvc-grid"));
 
                     grid.reload();
+                    
                     let html = `<div class="alert alert-success alert-dismissible fade show" role="alert">
                                     ${resultado}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>`
                     $("#avisos").html(html);
                     modal.hide();
+
                 }).fail((jqXHR, textStatus, errorThrown) =>
                 {
                     if (jqXHR != undefined && jqXHR.responseJSON != undefined && jqXHR.responseJSON != null)
@@ -81,5 +83,7 @@
             $(".btn-action.active").removeClass("active");
             $(e).addClass("active");
         }
+
+        
     </script>
-    }
+}

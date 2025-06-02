@@ -80,12 +80,14 @@ namespace OficinasMecanicas.Web.Controllers
         public async Task<IActionResult> Editar(Guid id)
         {
             SetViewBagServicosPrestados();
-            var dtos = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops"); 
-
-            if (dtos == null)
-                return NotFound();
-            
-            var model = _mapper.Map<CadastrarEditarOficinaViewModel>(dtos.dados);
+            var dtos = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops");
+            ViewBag.MensagemErro = string.Empty;
+            if (dtos.dados == null)
+            {
+                ViewBag.MensagemErro = dtos.mensagem;
+                return View(new CadastrarEditarOficinaViewModel() { Id = id } );
+            }
+            var model = _mapper.Map<CadastrarEditarOficinaViewModel>(dtos.dados );
             return View(model);
         }
 
@@ -95,6 +97,7 @@ namespace OficinasMecanicas.Web.Controllers
         public async Task<IActionResult> Editar(Guid id, CadastrarEditarOficinaViewModel model)
         {
             SetViewBagServicosPrestados();
+            ViewBag.MensagemErro = string.Empty;
             if (id != model.Id)
                 ModelState.AddModelError("", "Oficina inválida!");
 
@@ -108,8 +111,8 @@ namespace OficinasMecanicas.Web.Controllers
             if (respostaObjeto.sucesso) 
               TempData["Sucesso"] = "Oficina atualizada com sucesso!";
 
-            //return RedirectToAction(nameof(Index));
-            return RedirectToAction("Index", "OficinaMecanicas");
+            return RedirectToAction(nameof(Index));
+            
         }
 
         [HttpPost]
@@ -120,12 +123,12 @@ namespace OficinasMecanicas.Web.Controllers
 
             var oficina = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops");
             if (oficina == null)
-                return NotFound("Oficina não encontrada!");
+                return BadRequest("Oficina não encontrada!");
 
-            var respostaObjeto = await _oficinaAppServico.DeleteWebApi(id, $"api/repairshops");            
+            var respostaObjeto = await _oficinaAppServico.DeleteWebApi(id, $"api/repairshops");
 
-            TempData["Sucesso"] = "Oficina excluída com sucesso!";
-            return RedirectToAction("Index", "OficinaMecanicas");
+            TempData["Sucesso"] = "Oficina excluída com sucesso !";
+            return Ok("Oficina excluída com sucesso !");
         }
     }
 }

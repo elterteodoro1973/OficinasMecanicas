@@ -2,7 +2,7 @@
 @using OficinasMecanicas.Web.ViewModels.Oficinas;
 @model CadastrarEditarOficinaViewModel
 @{
-    TempData["Title"] = "Cadastrar Usuário";
+    TempData["Title"] = "Adicionar Oficina";
     List<ServicosPrestados> listaServico = ViewBag.listaServico as List<ServicosPrestados>;
 }
 
@@ -52,7 +52,7 @@
         <div class="row">
             <div class="c-form__group col-8">
                 <label asp-for="Servicos" class="c-form__label form-label control-label"></label>
-                <input asp-for="Servicos"    class="c-form__input form-control" required placeholder="Email">
+                <input asp-for="Servicos"    class="c-form__input form-control" required placeholder="Serviços">
                 <span asp-validation-for="Servicos" class="form-text text-danger"></span>
             </div>
             <div class="c-form__group col-4">
@@ -62,11 +62,10 @@
 
         <div class="row">
             <div class="c-form__group col-8">
-                <label asp-for="Servicos" class="c-form__label form-label control-label">Select os serviçoes abaixo: </label>
+                <label asp-for="Servicos" class="c-form__label form-label control-label">Selecione os serviçoes abaixo: </label>
 
                 <select size="4" name="multiple-select-field"  id="multiple-select-field"  multiple="multiple" ondblclick="populaServico();">
-                    <option selected></option>
-                    <option value="1">One</option>
+                    <option selected></option>                    
                     @foreach (ServicosPrestados item in listaServico)
                     {
                         <option value="@item.Id" onclick="populaServico" >@item.Nome</option>
@@ -85,7 +84,7 @@
     </div>    
 
     <div class="c-form__btn-group">
-        <input type="submit" value="Cadastrar Usuário" class="o-btn o-btn-default">
+        <input type="submit" value="Cadastrar" class="o-btn o-btn-default">
         <input type="button" value="Cancelar" class="o-btn o-btn-alt" onclick="paginaInicial()">
     </div>
 </form>

@@ -1,7 +1,7 @@
 ﻿@using OficinasMecanicas.Web.ViewModels.Usuarios;
 
 <h1 class="o-title">
-    Oficina
+    Oficinas
 </h1>
 <partial name="~/Views/Shared/_Avisos.cshtml" />
 <div id="avisos"></div>
@@ -11,7 +11,9 @@
         <a href="@Url.Action("Adicionar","OficinaMecanicas")" class="o-btn o-btn-default">Adicionar oficina</a>
     </div>
 
-    @Html.AjaxGrid(Url.Action("Index"))
+    <div id="Grid">
+        @Html.AjaxGrid(Url.Action("Index"))
+    </div>    
 </div>
 
 @section Scripts {
@@ -43,9 +45,9 @@
                     async: false
                 }).done((resultado) => 
                 {
-                    const grid = new MvcGrid(document.querySelector(".mvc-grid"));
+                    //const grid = new MvcGrid(document.querySelector(".mvc-grid"));
 
-                    grid.reload();
+                    //grid.reload();
                     let html = `<div class="alert alert-success alert-dismissible fade show" role="alert">
                                     ${resultado}
                                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

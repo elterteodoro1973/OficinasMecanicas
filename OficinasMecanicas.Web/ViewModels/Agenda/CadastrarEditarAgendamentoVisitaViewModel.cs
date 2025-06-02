@@ -6,8 +6,7 @@ namespace OficinasMecanicas.Web.ViewModels.Agenda
     {
         public Guid? Id { get; set; }
 
-        [Display(Name = "Nome")]
-        [Required(ErrorMessage = "{0} é obrigatório !")]
+        [Display(Name = "Nome")]      
         [StringLength(256, ErrorMessage = "{0} possui tamanho máximo de 256 caracteres !")]
         public string Nome { get; set; } = null!;
 
@@ -16,7 +15,8 @@ namespace OficinasMecanicas.Web.ViewModels.Agenda
 
         [Display(Name = "Cliente")]
         public string NomeCliente { get; set; } = null!;
-        
+
+        [Required(ErrorMessage = "O nome da Oficina é obrigatório !")]
         public Guid IdOficina { get; set; }
 
         [Display(Name = "Oficina")]
@@ -26,6 +26,7 @@ namespace OficinasMecanicas.Web.ViewModels.Agenda
         public DateTime DataHora { get; set; }
 
         [Display(Name = "Objetivo da visita")]
+        [Required(ErrorMessage = "O Objetivo é obrigatório !")]
         public string Descricao { get; set; } = null!;
 
     }

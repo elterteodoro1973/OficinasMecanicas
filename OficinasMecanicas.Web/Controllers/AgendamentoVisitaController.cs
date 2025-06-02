@@ -7,6 +7,8 @@ using OficinasMecanicas.Dominio.Interfaces;
 using OficinasMecanicas.Web.ViewModels.Agenda;
 using OficinasMecanicas.Aplicacao.Servicos;
 using OficinasMecanicas.Web.ViewModels.Usuarios;
+using OficinasMecanicas.Web.ViewModels.Oficinas;
+using Irony.Parsing;
 
 namespace OficinasMecanicas.Web.Controllers
 {
@@ -45,7 +47,7 @@ namespace OficinasMecanicas.Web.Controllers
 
         private async Task SetViewBagOficinas()
         {
-            var listaOficinas =  _oficinaAppServico.GetWebApi("api/user").Result;
+            var listaOficinas =  _oficinaAppServico.GetWebApi("api/repairshops").Result;
             ViewBag.listaOficinas = listaOficinas.dados;
         }
 
@@ -53,8 +55,7 @@ namespace OficinasMecanicas.Web.Controllers
         {
             if (HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
-                var agendas = await _agendaVisitaAppServico.ListarAgendamentoVisitasTelaInicial(filtro);
-                //var model = _mapper.Map<List<AgendamentoVisitaViewModel>>(agendas.AsEnumerable());
+                var agendas = await _agendaVisitaAppServico.ListarAgendamentoVisitasTelaInicial(filtro);                
                 return PartialView("Grid", agendas.AsEnumerable());
             }
 
@@ -67,7 +68,7 @@ namespace OficinasMecanicas.Web.Controllers
 
             var usuario = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "UsuarioId");
 
-            var registro = new CadastrarEditarAgendamentoVisitaViewModel() { Id = Guid.NewGuid() };
+            var registro = new CadastrarEditarAgendamentoVisitaViewModel() { Id = Guid.NewGuid() , DataHora = DateTime.Now.AddDays(1).Date };
 
             if (usuario != null && !string.IsNullOrEmpty(usuario.Value))
             {
@@ -84,11 +85,9 @@ namespace OficinasMecanicas.Web.Controllers
         {
             SetViewBagOficinas();
             ViewBag.MensagemErro = String.Empty;
-            if (!ModelState.IsValid)
-                return View(model);
-
+            
             var agendamentoDB = _mapper.Map<CadastrarAgendamentoVisitaDTO>(model);
-            var respostaObjeto = await _agendaVisitaAppServico.PostWebApi<CadastrarAgendamentoVisitaDTO>(agendamentoDB, "api/repairshops");
+            var respostaObjeto = await _agendaVisitaAppServico.PostWebApi<CadastrarAgendamentoVisitaDTO>(agendamentoDB, "api/bookings");
             if (!respostaObjeto.sucesso)
             {
                 ViewBag.MensagemErro = respostaObjeto.mensagem;
@@ -103,10 +102,13 @@ namespace OficinasMecanicas.Web.Controllers
         {
             SetViewBagOficinas();
             var dtos = await _agendaVisitaAppServico.GetWebApiById(id, $"api/bookings");
-
-            if (dtos == null)
-                return NotFound();
             
+            if (dtos.dados == null)
+            {
+                ViewBag.MensagemErro = dtos.mensagem;
+                return View(new CadastrarEditarAgendamentoVisitaViewModel() { Id = id });
+            }
+
             var model = _mapper.Map<CadastrarEditarAgendamentoVisitaViewModel>(dtos.dados);
             return View(model);
         }
@@ -119,19 +121,15 @@ namespace OficinasMecanicas.Web.Controllers
             SetViewBagOficinas();
             if (id != model.Id)
                 ModelState.AddModelError("", "Agendamento inválido!");
-
-            if (!ModelState.IsValid)
-                return View(model);
-
+            
             var agendamento = _mapper.Map<CadastrarAgendamentoVisitaDTO>(model);
             
 
             var respostaObjeto = await _agendaVisitaAppServico.PutWebApi(id, agendamento, $"api/bookings");
             if (respostaObjeto.sucesso)
                 TempData["Sucesso"] = "AgendamentoVisita atualizada com sucesso!";
-
-            //return RedirectToAction(nameof(Index));
-            return RedirectToAction("Index", "AgendamentoVisitaMecanicas");
+            
+            return RedirectToAction("Index", "AgendamentoVisita");
         }
 
         [HttpPost]
@@ -141,13 +139,13 @@ namespace OficinasMecanicas.Web.Controllers
             SetViewBagOficinas(); 
 
             var agendamento = await _agendaVisitaAppServico.GetWebApiById(id, $"api/bookings");
-            if (agendamento == null)
-                return NotFound("Agendamento não encontrado!");
+            if (agendamento == null)               
+               return BadRequest("Agendamento não encontrado!");
 
             var respostaObjeto = await _agendaVisitaAppServico.DeleteWebApi(id, $"api/bookings");
 
             TempData["Sucesso"] = "AgendamentoVisita excluída com sucesso!";
-            return RedirectToAction("Index", "AgendamentoVisitaMecanicas");
+            return Ok("AgendamentoVisita excluída com sucesso !");
         }
     }
 }
