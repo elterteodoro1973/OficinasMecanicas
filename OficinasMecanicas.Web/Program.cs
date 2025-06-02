@@ -10,9 +10,7 @@ using OficinasMecanicas.Web.Configuracoes.AutoMapper;
 using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.Configure<EmailConfiguracao>(builder.Configuration.GetSection("EmailConfiguracao"));
 
 InjetorDependencias.ConfigurarContextosEFCore(builder.Services, connectionString);
 InjetorDependencias.ConfigurarServicosERepositorios(builder.Services);

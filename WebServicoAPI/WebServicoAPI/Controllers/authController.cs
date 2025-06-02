@@ -76,7 +76,7 @@ namespace WebServicoAPI.Controllers
                 if (await _usuarioAppServico.NomePrincipalJaCadastrado(usuarioDTO.Nome, null))
                     return BadRequest("usuário ja cadastrado.");
 
-                var usuario = await _usuarioAppServico.Adicionar("", usuarioDTO);
+                var usuario = await _usuarioAppServico.Adicionar(usuarioDTO.DiretorioBase, usuarioDTO);
 
                 if (_notificador.TemNotificacao())
                 {                    

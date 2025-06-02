@@ -26,14 +26,16 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContext;
-        public UsuarioAppServico(IHttpContextAccessor httpContext,IMapper mapper,INotificador notificador,IUsuarioRepositorio usuarioRepositorio,IUsuariosServico usuarioServico, IConfiguration configuration)
+        
+        public UsuarioAppServico(IHttpContextAccessor httpContext,IMapper mapper,INotificador notificador,
+            IUsuarioRepositorio usuarioRepositorio,IUsuariosServico usuarioServico, IConfiguration configuration)
         {
             _httpContext = httpContext;
             _usuarioRepositorio = usuarioRepositorio;
             _mapper = mapper;
             _notificador = notificador;
             _usuarioServico = usuarioServico;
-            _configuration = configuration;
+            _configuration = configuration;            
         }
 
         public async Task<EditarUsuarioDTO> Adicionar(string caminho, CadastrarUsuarioDTO dto)
@@ -240,8 +242,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<UserToken>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<UserToken>("Erro ao processar a resposta da API, objeto de retorno nulo.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<UserToken>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API, objeto de retorno nulo.");
 
                     return respostaObjeto;
                 }
@@ -264,8 +266,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<UsuariosTelaInicialDTO>>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null) 
-                        return RetornoWebErro<IList<UsuariosTelaInicialDTO>>("Erro ao processar a resposta da API, objeto de retorno nulo.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso) 
+                        return RetornoWebErro<IList<UsuariosTelaInicialDTO>>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API, objeto de retorno nulo.");
                                         
                     return respostaObjeto;
                 }

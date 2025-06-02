@@ -5,6 +5,7 @@ using WebServicoAPI.JWT;
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
 InjetorDependencias.ConfigurarContextosEFCore(builder.Services, connectionString);
 InjetorDependencias.ConfigurarServicosERepositorios(builder.Services);
 InjetorDependencias.ConfigurarAutoMapper(builder.Services);

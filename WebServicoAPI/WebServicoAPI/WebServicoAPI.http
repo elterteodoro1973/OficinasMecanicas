@@ -1,6 +1,0 @@
-@WebServicoAPI_HostAddress = http://localhost:5213
-
-GET {{WebServicoAPI_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

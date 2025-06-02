@@ -157,8 +157,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<AgendamentosVisitasTelaInicialDTO>>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>("Erro ao processar a resposta da API.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API.");
                     return respostaObjeto;
                 }
             }
@@ -180,8 +180,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao processar a resposta da API.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API.");
                     return respostaObjeto;
                 }
             }
@@ -202,8 +202,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao gravar os dados da oficina via API.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao gravar os dados da oficina via API.");
                     return respostaObjeto;
                 }
             }
@@ -225,8 +225,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao atualizar os dados da oficina via API.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao atualizar os dados da oficina via API.");
                     return respostaObjeto;
                 }
             }
@@ -248,8 +248,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao deletar a oficina via API");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao deletar a oficina via API.");
                     return respostaObjeto;
                 }
             }

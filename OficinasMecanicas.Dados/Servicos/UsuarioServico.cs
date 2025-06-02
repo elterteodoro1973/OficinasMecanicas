@@ -21,24 +21,19 @@ namespace OficinasMecanicas.Dados.Servicos
         private readonly IHttpContextAccessor _httpContext;
         private readonly IUsuarioRepositorio _usuarioRepositorio;
         private readonly IResetarSenhaRepositorio _resetarSenhaRepositorio;
-        private INotificador _notificador;       
-             
-        private readonly EmailConfiguracao _emailConfiguracao;
-        private readonly IEmailServico _emailServico;
-       
+        private INotificador _notificador;
+        private readonly IEmailServico _emailServico;       
 
         public UsuarioServico(IHttpContextAccessor httpContext, 
             IUsuarioRepositorio usuarioRepositorio,
             IResetarSenhaRepositorio resetarSenhaRepositorio,
             INotificador notificador,
-            IEmailServico emailServico,            
-            IOptions<EmailConfiguracao> emailConfiguracao  ) : base(notificador)
+            IEmailServico emailServico ) : base(notificador)
         {
             _httpContext = httpContext;
             _usuarioRepositorio = usuarioRepositorio;
             _resetarSenhaRepositorio = resetarSenhaRepositorio;
-            _notificador = notificador;
-            _emailConfiguracao = emailConfiguracao.Value;
+            _notificador = notificador;            
             _emailServico = emailServico;
         }
 

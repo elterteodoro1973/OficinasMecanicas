@@ -154,6 +154,7 @@ namespace OficinasMecanicas.Web.Controllers
                 return View(model);
 
             var usuario = _mapper.Map<CadastrarUsuarioDTO>(model);
+            usuario.DiretorioBase  = _env.WebRootPath;
             var respostaObjeto = await _usuarioAppServico.PostWebApi<CadastrarUsuarioDTO>(usuario, "api/auth/register");
             if (!respostaObjeto.sucesso)
             {

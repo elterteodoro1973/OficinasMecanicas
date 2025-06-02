@@ -16,8 +16,7 @@ namespace OficinasMecanicas.Dados.Servicos
         private INotificador _notificador;
         public  ResetarSenhaServico(IHttpContextAccessor httpContext,
                 IResetarSenhaRepositorio resetarSenhaRepositorio,
-                INotificador notificador,                          
-                IOptions<EmailConfiguracao> emailConfiguracao) : base(notificador)
+                INotificador notificador) : base(notificador)
         {
             _httpContext = httpContext;
             _resetarSenhaRepositorio = resetarSenhaRepositorio;

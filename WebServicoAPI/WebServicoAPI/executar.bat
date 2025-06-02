@@ -1,0 +1,1 @@
+dotnet run --urls="https://localhost:7174;http://localhost:5213" WebServicoAPI

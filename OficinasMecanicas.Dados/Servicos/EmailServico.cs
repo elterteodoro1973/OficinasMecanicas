@@ -1,9 +1,5 @@
-﻿using Microsoft.Extensions.Options;
-using OficinasMecanicas.Dominio.DTO;
-using OficinasMecanicas.Dominio.Entidades;
-using OficinasMecanicas.Dominio.Entidades;
+﻿using Microsoft.Extensions.Configuration;
 using OficinasMecanicas.Dominio.Interfaces.Servicos;
-using System.Collections;
 using System.Net;
 using System.Net.Mail;
 
@@ -11,23 +7,24 @@ namespace OficinasMecanicas.Dados.Servicos
 {
     public class EmailServico : IEmailServico
     {
-        private readonly EmailConfiguracao _emailConfiguracao;
 
-        public EmailServico(IOptions<EmailConfiguracao> emailConfiguracao)
+        private readonly IConfiguration _configuration;
+
+        public EmailServico(IConfiguration configuration)
         {
-            _emailConfiguracao = emailConfiguracao.Value;
+            _configuration = configuration;
         }
 
         public async Task Enviar(string destinatario, string assunto, string email, IList<string>? listaEmailCopias = null)
         {
-            using (var smtpClient = new SmtpClient(_emailConfiguracao.EnderecoSMTP, _emailConfiguracao.Porta))
+            using (var smtpClient = new SmtpClient(_configuration["EmailConfiguracao:EnderecoSMTP"] , 587))
             {
-                smtpClient.Credentials = new NetworkCredential(_emailConfiguracao.Email, _emailConfiguracao.Senha.Trim());
+                smtpClient.Credentials = new NetworkCredential(_configuration["EmailConfiguracao:Email"] , _configuration["EmailConfiguracao:Senha"].Trim());
                 smtpClient.EnableSsl = true;
 
                 var mailMessage = new MailMessage
                 {
-                    From = new MailAddress(_emailConfiguracao.Email),
+                    From = new MailAddress(_configuration["EmailConfiguracao:Email"]),  
                     Subject = assunto,
                     Body = email,
                     IsBodyHtml = true

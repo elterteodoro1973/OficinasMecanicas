@@ -151,8 +151,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<OficinasTelaInicialDTO>>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<IList<OficinasTelaInicialDTO>>("Erro ao processar a resposta da API.");                    
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<IList<OficinasTelaInicialDTO>>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API.");                    
                     return respostaObjeto;
                 }
             }
@@ -174,8 +174,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)                                           
-                        return RetornoWebErro<EditarOficinaDTO>("Erro ao processar a resposta da API.");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)                                           
+                        return RetornoWebErro<EditarOficinaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao processar a resposta da API.");
                     return respostaObjeto;
                 }
             }
@@ -196,8 +196,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaPostAPI = await clienteAPI.PostAsync(endPoint, ConteudoJson(model));
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
-                    if (respostaObjeto == null || respostaObjeto.dados == null)                                            
-                        return RetornoWebErro<EditarOficinaDTO>("Erro ao gravar os dados da oficina via API => ");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)                                            
+                        return RetornoWebErro<EditarOficinaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao gravar os dados da oficina via API.");
 
                     return respostaObjeto;
                 }
@@ -220,8 +220,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarOficinaDTO>("Erro ao atualizar o dados da oficina via API => ");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)
+                        return RetornoWebErro<EditarOficinaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao atualizar o dados da oficina via API.");
                     return respostaObjeto;
                 }
             }
@@ -243,8 +243,8 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
 
-                    if (respostaObjeto == null || respostaObjeto.dados == null)                    
-                        return RetornoWebErro<EditarOficinaDTO>("Erro ao deletar a oficina via API=>");
+                    if (respostaObjeto == null || !respostaObjeto.sucesso)                    
+                        return RetornoWebErro<EditarOficinaDTO>(respostaObjeto != null ? respostaObjeto.mensagem : "Erro ao deletar a oficina via API.");
                     return respostaObjeto;
                 }
             }

@@ -12,7 +12,7 @@ namespace WebServicoAPI.JWT
 
         public JWToken(IConfiguration configuration)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _configuration = configuration;
         }
 
         public string GenerateToken(Guid id, string email)
