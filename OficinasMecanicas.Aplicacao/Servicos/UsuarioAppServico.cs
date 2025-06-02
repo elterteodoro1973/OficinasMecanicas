@@ -61,108 +61,6 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         {
             return  await _usuarioRepositorio.BuscarTodos();
         }
-        private void ConfiguraClien(HttpClient client)
-        {
-            var enderecoBase = _configuration["baseURL:link"];
-            var tokenClaim =  !_httpContext.HttpContext.User.Identity.IsAuthenticated ? "" :
-                               _httpContext.HttpContext.User?.Claims.First(c => c.Type == "TokenUsuario").Value.ToString();
-
-            client.BaseAddress = new Uri(enderecoBase);
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));            
-            //client.DefaultRequestHeaders.Clear();
-            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim);
-        }
-
-
-
-        public async Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint)
-        {
-            var enderecoBase = _configuration["baseURL:link"];
-            if (string.IsNullOrEmpty(enderecoBase))
-            {
-                return new Resposta<UserToken>
-                {
-                    sucesso = false,
-                    mensagem = "Erro ao processar a resposta da API.",
-                    dados = default
-                };
-            }
-
-            try
-            {
-                using (var clienteAPI = new HttpClient())
-                {
-                    ConfiguraClien(clienteAPI);
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
-                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
-                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<UserToken>>(respostaconteudo);
-
-                    if (respostaObjeto == null)
-                    {
-                        return new Resposta<UserToken>
-                        {
-                            sucesso = false,
-                            mensagem = "Erro ao processar a resposta da API.",
-                            dados = default
-                        };
-                    }
-
-                    return respostaObjeto;
-                }
-            }
-            catch (Exception ex)
-            {                
-                return new Resposta<UserToken>
-                {
-                    sucesso = false,
-                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
-                    dados = default
-                };
-            }
-        }
-
-        public async Task<Resposta<IList<UsuariosTelaInicialDTO>>> GetWebApi(string endPoint)
-        {
-            try
-            {
-                using (var clienteAPI = new HttpClient())
-                {                    
-                    ConfiguraClien(clienteAPI);
-
-                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
-                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
-                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<UsuariosTelaInicialDTO>>>(respostaconteudo);
-
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                    {
-                        return new Resposta<IList<UsuariosTelaInicialDTO>>
-                        {
-                            sucesso = false,
-                            mensagem = "Erro ao processar a resposta da API.",
-                            dados = default
-                        };
-                    }
-                    return respostaObjeto;
-                }
-            }
-            catch (Exception ex)
-            {
-                return new Resposta<IList<UsuariosTelaInicialDTO>>
-                {
-                    sucesso = false,
-                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
-                    dados = default
-                };
-            }
-        }
-
-
 
         public async Task RegistrarLogin(Resposta<UserToken> resposta)
         {
@@ -294,6 +192,89 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return await _usuarioServico.EmailPrincipalJaCadastrado(email, id); ;
         }
 
-        
+        #region HttpClient
+        private void ConfiguraClien(HttpClient client)
+        {
+            var enderecoBase = _configuration["baseURL:link"];
+            var tokenClaim = !_httpContext.HttpContext.User.Identity.IsAuthenticated ? "" :
+                               _httpContext.HttpContext.User?.Claims.First(c => c.Type == "TokenUsuario").Value.ToString();
+
+            client.BaseAddress = new Uri(enderecoBase);
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("Mozilla", "5.0"));
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + tokenClaim);
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenClaim);
+        }
+
+        private Resposta<T> RetornoWebErro<T>(string mensagem)
+        {
+            // Retorna um objeto de resposta com erro
+            return new Resposta<T>
+            {
+                sucesso = false,
+                mensagem = mensagem,
+                dados = default
+            };
+        }
+        private StringContent ConteudoJson<T>(T model)
+        {
+            // Corrige o método para retornar o objeto correto
+            var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return conteudoJSON;
+        }
+
+        public async Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint)
+        {
+            var enderecoBase = _configuration["baseURL:link"];
+            if (string.IsNullOrEmpty(enderecoBase))
+                return RetornoWebErro<UserToken>("Erro ao processar a resposta da API,o endereço base esta vazio.");
+
+            try
+            {
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, ConteudoJson(model));
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<UserToken>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null)
+                        return RetornoWebErro<UserToken>("Erro ao processar a resposta da API, objeto de retorno nulo.");
+
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+               return RetornoWebErro<UserToken>("Erro de comunicação ao processar a requisição:" + ex.Message);
+            }
+        }
+
+        public async Task<Resposta<IList<UsuariosTelaInicialDTO>>> GetWebApi(string endPoint)
+        {
+            try
+            {
+                using (var clienteAPI = new HttpClient())
+                {
+                    ConfiguraClien(clienteAPI);
+
+                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
+                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
+                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<IList<UsuariosTelaInicialDTO>>>(respostaconteudo);
+
+                    if (respostaObjeto == null || respostaObjeto.dados == null) 
+                        return RetornoWebErro<IList<UsuariosTelaInicialDTO>>("Erro ao processar a resposta da API, objeto de retorno nulo.");
+                                        
+                    return respostaObjeto;
+                }
+            }
+            catch (Exception ex)
+            {
+                return RetornoWebErro<IList<UsuariosTelaInicialDTO>>("Erro de comunicação ao processar a requisição:" + ex.Message);                
+            }
+        }
+        #endregion
     }
 }

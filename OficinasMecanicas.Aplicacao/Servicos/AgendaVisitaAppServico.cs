@@ -113,12 +113,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return dtos;
         }
 
-        /// <summary>
-        /// 
-        /// 
-        /// </summary>
-        /// <param name="client"></param>
-        /// 
+        #region HttpClient
         private void ConfiguraClien(HttpClient client)
         {
             // Configura o cliente HTTP com a URL base e os cabeçalhos necessários
@@ -142,6 +137,13 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                 dados = default
             };
         }
+        private StringContent ConteudoJson<T>(T model)
+        {
+            // Corrige o método para retornar o objeto correto
+            var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return conteudoJSON;
+        }
 
         public async Task<Resposta<IList<AgendamentosVisitasTelaInicialDTO>>> GetWebApi(string endPoint)
         {
@@ -162,7 +164,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<IList<AgendamentosVisitasTelaInicialDTO>>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -185,34 +187,29 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
         public async Task<Resposta<EditarAgendamentoVisitaDTO>> PostWebApi<T1>(T1 model, string endPoint)
         {
-
             try
             {  //Grava o objeto OficinaMecanica via API
                 using (var clienteAPI = new HttpClient())
                 {
                     ConfiguraClien(clienteAPI);
-
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
-
+                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, ConteudoJson(model));
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
                     if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao gravar os dados da oficina via API => ");
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao gravar os dados da oficina via API.");
                     return respostaObjeto;
                 }
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -220,26 +217,22 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         {
             try
             {
-                //Atualiza o objeto OficinaMecanica via API pelo id
+                // Atualiza o objeto OficinaMecanica via API pelo id
                 using (var clienteAPI = new HttpClient())
                 {
                     ConfiguraClien(clienteAPI);
-
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", conteudoJSON);
+                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", ConteudoJson(model));
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
                     if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao atualizar o dados da oficina via API => ");
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao atualizar os dados da oficina via API.");
                     return respostaObjeto;
                 }
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -256,15 +249,16 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarAgendamentoVisitaDTO>>(respostaconteudo);
 
                     if (respostaObjeto == null || respostaObjeto.dados == null)
-                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao deletar a oficina via API=>");
+                        return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro ao deletar a oficina via API");
                     return respostaObjeto;
                 }
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarAgendamentoVisitaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
-
+       
+        #endregion
     }
 }

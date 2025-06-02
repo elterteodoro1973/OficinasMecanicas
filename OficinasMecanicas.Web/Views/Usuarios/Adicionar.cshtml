@@ -13,13 +13,9 @@
     <input type="hidden" asp-for="Id" value="@Model.Id" />
     <div class="c-form__section">
 
-
-
-
         <span class="c-form__section--label">Dados gerais</span>       
         <div asp-validation-summary="All" id="ValidadorSumario" name="ValidadorSumario" class="text-danger center-content-start"></div>
-
-        
+               
 
         <div class="row">
             <div class="c-form__group col-11">
@@ -74,11 +70,7 @@
             </div>
             <div class="c-form__group col-4">
             </div>
-        </div>
-
-
-        
-
+        </div> 
 
     </div>    
 
@@ -92,8 +84,7 @@
 {
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-    
+    }   
    
     <script>
 
@@ -112,24 +103,22 @@
           var senha = document.getElementById("Senha");
           var confirmarSenha = document.getElementById("ConfirmarSenha");
 
-          if (senha.value == "" || confirmarSenha.value == null)
-          {
-              //document.getElementById("ConfirmarSenhaValida").html = "Informe a senha.";
+          if (senha.value == "" || confirmarSenha.value == null)          {
+              
               alert("Informe a senha.");
               return false;
           }
 
           if (confirmarSenha.value == "" || confirmarSenha.value == null)
-          {
-              //document.getElementById("ConfirmarSenhaValida").html = "Informe a senha de validação.";
+          {              
               alert("Informe a senha de validação.");
               return false;
           }
 
 
-          if (senha.value !== confirmarSenha.value)
+          if (senha.value !== confirmarSenha.value)          
           {
-              //document.getElementById("ConfirmarSenhaValida").html = "As senhas não conferem.";
+              
               alert("As senhas não conferem..");
               return false;
           }         

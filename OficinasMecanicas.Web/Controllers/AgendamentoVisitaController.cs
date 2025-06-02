@@ -43,7 +43,7 @@ namespace OficinasMecanicas.Web.Controllers
             _servicosPrestadosServico = servicosPrestadosServico;
         }
 
-        private async Task SetViewBagServicos()
+        private async Task SetViewBagOficinas()
         {
             var listaOficinas =  _oficinaAppServico.GetWebApi("api/user").Result;
             ViewBag.listaOficinas = listaOficinas.dados;
@@ -63,7 +63,7 @@ namespace OficinasMecanicas.Web.Controllers
 
         public async Task<IActionResult> Adicionar()
         {
-            SetViewBagServicos();
+            SetViewBagOficinas();
 
             var usuario = _httpContext.HttpContext?.User.Claims.FirstOrDefault(c => c.Type == "UsuarioId");
 
@@ -82,7 +82,7 @@ namespace OficinasMecanicas.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Adicionar(CadastrarEditarAgendamentoVisitaViewModel model)
         {
-            SetViewBagServicos();
+            SetViewBagOficinas();
             ViewBag.MensagemErro = String.Empty;
             if (!ModelState.IsValid)
                 return View(model);
@@ -101,11 +101,12 @@ namespace OficinasMecanicas.Web.Controllers
 
         public async Task<IActionResult> Editar(Guid id)
         {
+            SetViewBagOficinas();
             var dtos = await _agendaVisitaAppServico.GetWebApiById(id, $"api/bookings");
 
             if (dtos == null)
                 return NotFound();
-            SetViewBagServicos();
+            
             var model = _mapper.Map<CadastrarEditarAgendamentoVisitaViewModel>(dtos.dados);
             return View(model);
         }
@@ -115,7 +116,7 @@ namespace OficinasMecanicas.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Editar(Guid id, CadastrarEditarAgendamentoVisitaViewModel model)
         {
-            SetViewBagServicos();
+            SetViewBagOficinas();
             if (id != model.Id)
                 ModelState.AddModelError("", "Agendamento inválido!");
 
@@ -137,7 +138,7 @@ namespace OficinasMecanicas.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Excluir(Guid id)
         {
-            SetViewBagServicos();
+            SetViewBagOficinas(); 
 
             var agendamento = await _agendaVisitaAppServico.GetWebApiById(id, $"api/bookings");
             if (agendamento == null)

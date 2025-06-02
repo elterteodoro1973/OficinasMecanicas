@@ -14,7 +14,6 @@ namespace OficinasMecanicas.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-
         public HomeController(ILogger<HomeController> logger, INotificador notificador) : base(notificador)
         {
             _logger = logger;
@@ -24,11 +23,7 @@ namespace OficinasMecanicas.Web.Controllers
         {
             return View();
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

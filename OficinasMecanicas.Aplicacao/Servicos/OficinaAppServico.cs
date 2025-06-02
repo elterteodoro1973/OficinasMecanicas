@@ -87,44 +87,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             return dtos;
         }
 
-        public async Task<Resposta<EditarOficinaDTO>> RequisitarDadosPorId(Guid id, string endPoint)
-        {
-            try
-            {
-                using (var clienteAPI = new HttpClient())
-                {
-                    ConfiguraClien(clienteAPI);
-
-                    var respostaPostAPI = await clienteAPI.GetAsync(endPoint);
-                    var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
-                    var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
-
-                    if (respostaObjeto == null || respostaObjeto.dados == null)
-                    {
-                        return new Resposta<EditarOficinaDTO>
-                        {
-                            sucesso = false,
-                            mensagem = "Erro ao processar a resposta da API.",
-                            dados = default
-                        };
-                    }
-                    return respostaObjeto;
-                }
-            }
-            catch (Exception ex)
-            {
-                return new Resposta<EditarOficinaDTO>
-                {
-                    sucesso = false,
-                    mensagem = "Erro de comunicação ao processar a requisição:" + ex.Message,
-                    dados = default
-                };
-            }
-        }
-
-
-
-
+        
         public async Task<EditarOficinaDTO?> BuscarPorNome(string nome)
         {
             var dtos = _mapper.Map<EditarOficinaDTO>(await _oficinaMecanicaServico.BuscarPorNome(nome));
@@ -144,12 +107,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
         }
 
 
-        /// <summary>
-        /// 
-        /// 
-        /// </summary>
-        /// <param name="client"></param>
-        /// 
+        #region HttpClient
         private void ConfiguraClien(HttpClient client)
         {
             // Configura o cliente HTTP com a URL base e os cabeçalhos necessários
@@ -174,6 +132,13 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             };
         }
 
+        private StringContent ConteudoJson<T>(T model)
+        {
+            // Corrige o método para retornar o objeto correto
+            var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
+            conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            return conteudoJSON;
+        }
         public async Task<Resposta<IList<OficinasTelaInicialDTO>>> GetWebApi(string endPoint)
         {
             try
@@ -193,7 +158,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
             catch (Exception ex)
             {                
-               return RetornoWebErro<IList<OficinasTelaInicialDTO>>("Erro de comunicação ao processar a requisição:" + ex.Message);
+               return RetornoWebErro<IList<OficinasTelaInicialDTO>>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -216,7 +181,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);                
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);                
             }
         }
 
@@ -227,23 +192,19 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             {  //Grava o objeto OficinaMecanica via API
                 using (var clienteAPI = new HttpClient())
                 {
-                    ConfiguraClien(clienteAPI);                    
-
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, conteudoJSON);
-
+                    ConfiguraClien(clienteAPI);       
+                    var respostaPostAPI = await clienteAPI.PostAsync(endPoint, ConteudoJson(model));
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
-
                     if (respostaObjeto == null || respostaObjeto.dados == null)                                            
                         return RetornoWebErro<EditarOficinaDTO>("Erro ao gravar os dados da oficina via API => ");
+
                     return respostaObjeto;
                 }
             }
             catch (Exception ex)
             {               
-                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -255,11 +216,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                 using (var clienteAPI = new HttpClient())
                 {
                     ConfiguraClien(clienteAPI);
-
-                    var conteudoJSON = new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json");
-                    conteudoJSON.Headers.ContentType = new MediaTypeHeaderValue("application/json");
-
-                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", conteudoJSON);
+                    var respostaPostAPI = await clienteAPI.PutAsync($@"{endPoint}/{id}", ConteudoJson(model));
                     var respostaconteudo = await respostaPostAPI.Content.ReadAsStringAsync();
                     var respostaObjeto = JsonConvert.DeserializeObject<Resposta<EditarOficinaDTO>>(respostaconteudo);
 
@@ -270,7 +227,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
             }
             catch (Exception ex)
             {
-                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
+                return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição=>" + ex.Message);
             }
         }
 
@@ -296,7 +253,7 @@ namespace OficinasMecanicas.Aplicacao.Servicos
                 return RetornoWebErro<EditarOficinaDTO>("Erro de comunicação ao processar a requisição:" + ex.Message);
             }
         }
+        #endregion
 
-        
     }
 }

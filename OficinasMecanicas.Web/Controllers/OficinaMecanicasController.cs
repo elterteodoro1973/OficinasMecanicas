@@ -78,12 +78,13 @@ namespace OficinasMecanicas.Web.Controllers
         }
 
         public async Task<IActionResult> Editar(Guid id)
-        { 
+        {
+            SetViewBagServicosPrestados();
             var dtos = await _oficinaAppServico.GetWebApiById(id, $"api/repairshops"); 
 
             if (dtos == null)
                 return NotFound();
-            SetViewBagServicosPrestados();
+            
             var model = _mapper.Map<CadastrarEditarOficinaViewModel>(dtos.dados);
             return View(model);
         }

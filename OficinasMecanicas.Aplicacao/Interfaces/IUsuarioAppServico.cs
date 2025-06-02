@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 namespace OficinasMecanicas.Aplicacao.Interfaces
 {
     public interface IUsuarioAppServico
-    {
-        
+    {        
         Task Logout();
         Task RegistrarLogin(Resposta<UserToken> resposta);
         
@@ -21,7 +20,6 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         Task Atualizar(EditarUsuarioDTO dto);
 
         Task Excluir(Guid id);
-
         Task<IList<UsuariosTelaInicialDTO>> ListarUsuariosTelaInicial(string? filtro);
 
         Task<IList<Usuarios>> BuscarTodos();
@@ -38,8 +36,8 @@ namespace OficinasMecanicas.Aplicacao.Interfaces
         Task ValidarTokenCadastrarNovaSenha(string token);
         Task<bool> SenhaValidaLogin(string email, string senha);
         Task<bool> NomePrincipalJaCadastrado(string nome, Guid? id);
-        Task<bool> EmailPrincipalJaCadastrado(string email, Guid? id);
+        Task<bool> EmailPrincipalJaCadastrado(string email, Guid? id);        
+        Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint);        
         Task<Resposta<IList<UsuariosTelaInicialDTO>>> GetWebApi(string endPoint);
-        Task<Resposta<UserToken>> PostWebApi<T1>(T1 model, string endPoint);
     }
 }
